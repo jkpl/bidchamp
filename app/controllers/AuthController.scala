@@ -49,49 +49,47 @@ class AuthController @Inject() (val userStore: UserStore)
       UserAccount(
         UUID.randomUUID(),
         userReg.email,
-        Some(userReg.name),
-        userReg.phoneNumber,
-        DateTime.now(),
-        userReg.password,
-        0
+        userReg.email,
+        userReg.name,
+        "http://i2.kym-cdn.com/entries/icons/original/000/000/091/cancer.png"
       ))
     }
 
     validate.toOption.map(account => Future.successful(Ok(Json.toJson(account.uuid)))).getOrElse(Future.successful(BadRequest))
   }
 
-  def login() = Action.async(parse.json) { implicit request =>
-
-    val parse = request.body
-      .validate[LoginCredentials]
-      .fold(
-        errors => {
-          val errMsg = "/login - unable to parse request body" + errors.mkString(", ")
-          logger.error(errMsg)
-          Try(throw new RuntimeException(errMsg))
-        },
-        valid => Try(valid)
-      )
-
-
-    val validate = parse.toOption flatMap { loginCredentials: LoginCredentials =>
-
-      userStore.validPassword(loginCredentials.username, loginCredentials.password).map { token =>
-        Future.successful {
-          Ok.withCookies(
-            Cookie(
-              name = SessionTokenCookieName,
-              value = token.toString,
-              domain = cookieDomain,
-              maxAge = Some(86400),
-              secure = true
-            )
-          )
-        }
-      }
-    }
-      validate.getOrElse(Future.successful(BadRequest))
-  }
+//  def login() = Action.async(parse.json) { implicit request =>
+//
+//    val parse = request.body
+//      .validate[LoginCredentials]
+//      .fold(
+//        errors => {
+//          val errMsg = "/login - unable to parse request body" + errors.mkString(", ")
+//          logger.error(errMsg)
+//          Try(throw new RuntimeException(errMsg))
+//        },
+//        valid => Try(valid)
+//      )
+//
+//
+//    val validate = parse.toOption flatMap { loginCredentials: LoginCredentials =>
+//
+//      userStore.validPassword(loginCredentials.username, loginCredentials.password).map { token =>
+//        Future.successful {
+//          Ok.withCookies(
+//            Cookie(
+//              name = SessionTokenCookieName,
+//              value = token.toString,
+//              domain = cookieDomain,
+//              maxAge = Some(86400),
+//              secure = true
+//            )
+//          )
+//        }
+//      }
+//    }
+//      validate.getOrElse(Future.successful(BadRequest))
+//  }
 
   def logout() = Action.async { implicit request =>
     Future.successful(Ok)
@@ -122,7 +120,7 @@ class AuthController @Inject() (val userStore: UserStore)
 
       val validate = parse.toOption.map { userUpdate: UserUpdate =>
 
-        val updatedAccount = request.userAccount.copy(name = Some(userUpdate.name), passwordInfo = userUpdate.password, phoneNumber = userUpdate.phoneNumber)
+        val updatedAccount = request.userAccount.copy(name = userUpdate.name)
         userStore.upsertUser(updatedAccount)
 
             Created

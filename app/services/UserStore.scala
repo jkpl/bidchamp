@@ -19,13 +19,13 @@ trait UserStore {
 
   def upsertUser(userAccount: UserAccount): UserAccount
 
-  def validPassword(email: String, password: String): Option[UUID]
-
   def removeUser(email: String): Unit
 
   def removeToken(token: UUID): Unit
 
   def getUserByToken(token: UUID): Option[UserAccount]
+
+  def createSession(email : String): UUID
 
   def validSession(token: UUID): Boolean
 
@@ -35,15 +35,16 @@ trait UserStore {
 class MemoryUserStore extends UserStore {
 
   var users: Map[String, UserAccount] = Map.empty
-
   var tokenCache: Map[UUID, String] = Map.empty
 
   def listUsers(): Seq[UserAccount] = users.values.toSeq
 
   def getUser(email: String): Option[UserAccount] =  users.get(email)
 
-  def validPassword(email: String, password: String): Option[UUID] = users.get(email)
-    .map { case a if a.passwordInfo == password =>
+  def createSession(email : String): UUID = {
+      tokenCache.find(_._2 == email).foreach {
+        case (oldToken, _) => removeToken(oldToken)
+      }
       val uuid = UUID.randomUUID()
       tokenCache = tokenCache.updated(uuid, email)
       uuid

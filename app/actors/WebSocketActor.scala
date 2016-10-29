@@ -1,12 +1,15 @@
 package actors
 
+import java.util.UUID
+
 import akka.actor._
+import model.BidChampData
 import model.BidChampData.Command
-import play.api.libs.json.{JsString, JsValue, Reads}
+import play.api.libs.json._
 
 
 object WebSocketActor {
-  def props(out: ActorRef, gameActor: ActorRef) = Props(new WebSocketActor(out, gameActor))
+  def props(userId: UUID, out: ActorRef, gameActor: ActorRef) = Props(new WebSocketActor(userId, out, gameActor))
 }
 
 case class JsExtractor[T](implicit reads : Reads[T]){
@@ -19,17 +22,24 @@ case class JsExtractor[T](implicit reads : Reads[T]){
 /**
   * Processes Json and pass commands to change state of game.
   */
-class WebSocketActor(out: ActorRef, gameActor : ActorRef) extends Actor {
+class WebSocketActor(userId: UUID, out: ActorRef, gameActor : ActorRef) extends Actor with ActorLogging {
   val commandExtractor = JsExtractor[Command]()
-
 
   def receive = {
     case commandExtractor(command) =>
-      println(command)
-      out ! JsString("I received your auth command: " + command.toString)
+      log.info("Received command: {}", command)
+      gameActor ! BidChampData.UserCommand(userId, command)
 
+    case event: BidChampData.EventContent =>
+      log.info("Received event: {}", event)
+      out ! Json.toJson(event)
   }
 
   override def postStop() = {
+    gameActor ! BidChampActor.Unsubscribe
+  }
+
+  override def preStart(): Unit = {
+    gameActor ! BidChampActor.Subscribe(userId)
   }
 }
