@@ -9,6 +9,7 @@ GET     /socket                     controllers.BidChampController.socket
 
 
 POST /api/user/account              controllers.AuthController.createUserAccount()
+PUT  /api/user/account              controllers.AuthController.updateAccount()
 
 POST /api/user/password/request     controllers.PasswordController.newPasswordResetRequest
 POST /api/user/password/verify      controllers.PasswordController.newPasswordResetVerify
@@ -17,7 +18,7 @@ POST /api/user/password/reset       controllers.PasswordController.newPasswordRe
 POST /api/user/login                controllers.AuthController.login()
 POST /api/user/logout               controllers.AuthController.logout()
 GET  /api/user                      controllers.AuthController.getUser()
-GET  /api/users                      controllers.AuthController.listUsers()
+GET  /api/users                     controllers.AuthController.listUsers()
 
 
 

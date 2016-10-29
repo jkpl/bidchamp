@@ -17,10 +17,12 @@ case class UserAccount(
 
 case class UserRegistration(email: String, name: String, password: String, phoneNumber: Option[String])
 
+case class UserUpdate(password: String, phoneNumber: Option[String], name: String)
 
 object UserAccount {
 
   implicit val fmtUserAccount = Json.format[UserAccount]
   implicit val fmtUserRegistration = Json.format[UserRegistration]
+  implicit val fmtUserUpdate = Json.format[UserUpdate]
 
 }
