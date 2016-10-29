@@ -4,6 +4,7 @@ import java.util.UUID
 import javax.inject.{Inject, Singleton}
 
 import model.UserAccount
+import play.api.Configuration
 import play.api.libs.functional.syntax._
 import play.api.libs.json.{Json, _}
 import play.api.libs.ws.WSClient
@@ -14,7 +15,7 @@ import services.{OAuth2, OAuth2Settings, UserStore}
 import scala.concurrent.ExecutionContext.Implicits.global
 
 @Singleton
-class GithubAuthController @Inject()(userStore : UserStore)(implicit wsClient : WSClient) {
+class GithubAuthController @Inject()(userStore : UserStore, configuration: Configuration)(implicit wsClient : WSClient) {
 
   val SESSION_TOKEN_KEY = "session-token"
 
@@ -24,11 +25,12 @@ class GithubAuthController @Inject()(userStore : UserStore)(implicit wsClient : 
     "https://github.com/login/oauth/authorize",
     "https://github.com/login/oauth/access_token",
     "https://api.github.com/user",
-    "http://localhost:9000/callback"
+    s"http://${configuration.getString("callbackHost").get}/callback"
   ), wsClient){
     def user(body: String): GithubUser = { println(body); Json.parse(body).validate[GithubUser](githubUserReads).get}
   }
 
+  println(configuration.getString("callbackHost").get)
   case class GithubUser(
                          login: String,
                          email: String,
