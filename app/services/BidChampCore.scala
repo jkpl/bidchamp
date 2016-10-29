@@ -2,15 +2,15 @@ package services
 
 import javax.inject._
 
-import common.AtomicRef
+import actors.GameActor
+import akka.actor.{ActorRef, ActorSystem}
+
 
 trait BidChampCore {
-  def nextState(): Int
+  def gameActor : ActorRef
 }
 
 @Singleton
-class AtomicBidChampCore extends BidChampCore {
-  private val ref = new AtomicRef[Int](0)
-
-  override def nextState(): Int = ref.update(_ + 1)
+class AtomicBidChampCore @Inject()(actorSystem : ActorSystem )extends BidChampCore {
+  override def gameActor: ActorRef = actorSystem.actorOf(GameActor.props())
 }
