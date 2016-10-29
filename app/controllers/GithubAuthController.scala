@@ -26,7 +26,7 @@ class GithubAuthController @Inject()(userStore : UserStore)(implicit wsClient : 
     "https://api.github.com/user",
     "http://localhost:9000/callback"
   ), wsClient){
-    def user(body: String): GithubUser = Json.parse(body).validate[GithubUser](githubUserReads).get
+    def user(body: String): GithubUser = { println(body); Json.parse(body).validate[GithubUser](githubUserReads).get}
   }
 
   case class GithubUser(
