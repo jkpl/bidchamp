@@ -48,7 +48,7 @@ case class BidChampData(
 
     case UserCommand(userId, c) =>
       users.get(userId) match {
-        case None => justEvents(Event(Set(userId), EventContent(s"Invalid user.", None)))
+        case None => justEvents(Event(Set.empty, EventContent(s"Invalid user.", None)))
         case Some(userData) =>
           evalWithUser(userData.user, c)
       }
@@ -85,7 +85,7 @@ case class BidChampData(
     case bid: StartBid =>
       items.get(bid.item) match {
         case None =>
-          justEvents(Event(Set(user.uuid), EventContent(s"Item '${bid.item}' doesn't exist.", None)))
+          justEvents(Event(Set.empty, EventContent(s"Item '${bid.item}' doesn't exist.", None)))
         case Some(itemData) =>
           val game = Game.newInstance(nextGameId, itemData.item).upsertBid(user, bid.amount)
           Result(
@@ -96,7 +96,7 @@ case class BidChampData(
 
     case bid: AddToBid =>
       games.get(bid.game) match {
-        case None => justEvents(Event(Set(user.uuid), EventContent(s"No game #${bid.game} found.", None)))
+        case None => justEvents(Event(Set.empty, EventContent(s"No game #${bid.game} found.", None)))
         case Some(game) if game.isActive =>
           Result(
             state = updateGame(game.upsertBid(user, bid.amount)),
@@ -106,7 +106,7 @@ case class BidChampData(
             ))
           )
         case Some(game) =>
-          justEvents(Event(Set(user.uuid), EventContent(s"Can't bid on finished games.", None)))
+          justEvents(Event(Set.empty, EventContent(s"Can't bid on finished games.", None)))
       }
   }
 
