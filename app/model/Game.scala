@@ -1,5 +1,7 @@
 package model
 
+import services.DrawWinners
+
 import java.util.UUID
 
 case class Game(item : Item, bids : Map[Player, Bid], status : Status) { self =>
@@ -18,12 +20,17 @@ case class Game(item : Item, bids : Map[Player, Bid], status : Status) { self =>
       bid.amount.toDouble / divisor
     }
 
-  private def updateStatus() : Game = itemsToWin match {
-    case 0 => self.copy(status = NotStarted)
-    case n if n >= 1 => self.copy(status = Running(n))
+  def updateStatus() : Game = status match {
+    case NotStarted if itemsToWin > 1 =>
+      self.copy(status = Running(System.currentTimeMillis()))
+    case Running(startTime) if startTime + Game.gameTimeout > System.currentTimeMillis() =>
+      self.copy(status = Finished(DrawWinners(self)))
+    case _ =>
+      self
   }
 
-  def addSinglePlayer(user : User, bid: Bid) : Game = self.copy(bids = self.bids + (user -> bid)).updateStatus()
+  def addSinglePlayer(user : User, bid: Bid) : Game =
+    self.copy(bids = self.bids + (user -> bid)).updateStatus()
 
   def createTeam(teamName : String, members : List[User]) : Game = {
     val notInTeam = bids.filterKeys {
@@ -33,8 +40,9 @@ case class Game(item : Item, bids : Map[Player, Bid], status : Status) { self =>
     val teamBid = bids.collect {
       case (u@User(_,_), bid) if members.contains(u) => bid.amount
     }.sum
-    self.copy(bids =notInTeam + (Team(teamName, members) -> Bid(teamBid)))
-  }.updateStatus()
+
+    self.copy(bids = notInTeam + (Team(teamName, members) -> Bid(teamBid))).updateStatus()
+  }
 
   def upsertBid(player : Player, additionalAmount : Int) : Game = {
     val oldBidMaybe : Option[(Player, Bid)] = bids.collectFirst {
@@ -48,17 +56,21 @@ case class Game(item : Item, bids : Map[Player, Bid], status : Status) { self =>
 }
 
 object Game {
+  val gameTimeout = (10 * 60 * 1000).toLong // 10 minutes
+
   def newInstance(item : Item) = Game(item, Map(), NotStarted)
 }
 
-sealed trait Player
+sealed trait Player {
+  def name: String
+}
 case class User(name : String, uuid: UUID = UUID.randomUUID()) extends Player
-case class Team(teamName : String, users : List[User]) extends Player
+case class Team(name : String, users : List[User]) extends Player
 
 case class Bid(amount : Int)
 case class Item(name : String, price : Int)
 
 sealed trait Status
 case object NotStarted extends Status
-case class Running(nbItems : Int) extends Status
+case class Running(startTime: Long) extends Status
 case class Finished(winner : List[Player]) extends Status
