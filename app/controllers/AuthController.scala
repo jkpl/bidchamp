@@ -9,12 +9,12 @@ import model.{UserAccount, UserRegistration}
 import org.joda.time.DateTime
 import play.api.Logger
 import play.api.mvc.{Action, Controller}
-import services.services.UserStore
 
 import scala.concurrent.Future
 import scala.util.Try
 import model.UserAccount._
 import play.api.libs.json.Json
+import services.UserStore
 
 @Singleton
 class AuthController @Inject() (userStore: UserStore)

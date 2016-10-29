@@ -1,14 +1,15 @@
 package controllers
 
-import javax.inject.Singleton
+import javax.inject.{Inject, Singleton}
 
 import play.api.Logger
 import play.api.mvc.{Action, Controller}
+import services.UserStore
 
 import scala.concurrent.Future
 
 @Singleton
-class PasswordController extends Controller {
+class PasswordController @Inject() (userStore: UserStore) extends Controller {
 
   val logger: Logger = Logger(this.getClass)
 

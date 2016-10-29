@@ -1,5 +1,7 @@
 package model
 
+import java.util.UUID
+
 case class Game(item : Item, bids : Map[Player, Bid], status : Status) { self =>
   val moneyPooled: Int = bids.map(_._2.amount).sum
   val itemsToWin: Int = moneyPooled / item.price
@@ -29,7 +31,7 @@ case class Game(item : Item, bids : Map[Player, Bid], status : Status) { self =>
       case _ => true
     }
     val teamBid = bids.collect {
-      case (u@User(_), bid) if members.contains(u) => bid.amount
+      case (u@User(_,_), bid) if members.contains(u) => bid.amount
     }.sum
     self.copy(bids =notInTeam + (Team(teamName, members) -> Bid(teamBid)))
   }.updateStatus()
@@ -50,7 +52,7 @@ object Game {
 }
 
 sealed trait Player
-case class User(name : String) extends Player
+case class User(name : String, uuid: UUID = UUID.randomUUID()) extends Player
 case class Team(teamName : String, users : List[User]) extends Player
 
 case class Bid(amount : Int)
