@@ -2,7 +2,7 @@ package services
 
 import javax.inject._
 
-import actors.GameActor
+import actors.BidChampActor
 import akka.actor.{ActorRef, ActorSystem}
 
 
@@ -11,6 +11,6 @@ trait BidChampCore {
 }
 
 @Singleton
-class AtomicBidChampCore @Inject()(actorSystem : ActorSystem )extends BidChampCore {
-  override def gameActor: ActorRef = actorSystem.actorOf(GameActor.props())
+class AtomicBidChampCore @Inject()(actorSystem : ActorSystem) extends BidChampCore {
+  override def gameActor: ActorRef = actorSystem.actorOf(BidChampActor.props)
 }

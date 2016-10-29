@@ -17,6 +17,7 @@ import services.UserStore
 
 @Singleton
 class AuthController @Inject() (val userStore: UserStore)
+
   extends Controller with Authorization {
 
   val logger: Logger = Logger(this.getClass)
