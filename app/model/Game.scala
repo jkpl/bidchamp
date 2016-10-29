@@ -23,7 +23,7 @@ case class Game(item : Item, bids : Map[UUID, Int] = Map.empty, status : Status 
     }
 
   def updateStatus() : Game = status match {
-    case NotStarted if itemsToWin > 1 =>
+    case NotStarted if itemsToWin >= 1 =>
       self.copy(status = Running(System.currentTimeMillis()))
     case s: Running if s.endTime < System.currentTimeMillis() =>
       self.copy(status = Finished(s.startTime, s.endTime, DrawWinners(self)))
@@ -75,7 +75,7 @@ case class Running(startTime: Long, endTime: Long) extends Status {
 }
 
 object Running {
-  def apply(startTime: Long): Running = Running(startTime, startTime + (10 * 60 * 1000).toLong) // +10 minutes
+  def apply(startTime: Long): Running = Running(startTime, startTime + (1 * 60 * 1000).toLong) // +1 minutes
 }
 
 case class Finished(startTime: Long, endTime: Long, winners : List[UUID]) extends Status {

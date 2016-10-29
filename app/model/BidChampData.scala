@@ -91,6 +91,7 @@ case class BidChampData(
         addItems(updatedItems)
           .archiveGame(game)
           .copy(users = updatedUsers, charity = charity + game.exceedAmount)
+
       case _ =>
         this
     }
@@ -119,7 +120,7 @@ case class BidChampData(
             state = updateGame(game.upsertBid(userId, bid.amount)),
             events = List(Event(
               targets = game.bids.keySet - userId,
-              content = EventContent(s"New bid of ${bid.amount} has been added for item ${game.item.toString}.", Some(game.item.name))
+              content = EventContent(s"New bid of ${bid.amount} has been added for item ${game.item.toString}.", Some(game.item.name), EventContent.NOTIFICATION_TYPE)
             ))
           )
         case Some(game) =>
@@ -136,7 +137,7 @@ case class BidChampData(
       case (NotStarted, _: Running) =>
         List(Event(
           targets = bidders,
-          content = EventContent(s"The bid for '$itemName' has started! ~10 minutes until winners are drawn!", Some(gameId))
+          content = EventContent(s"The bid for '$itemName' has started! ~1 minute until winners are drawn!", Some(gameId))
         ))
 
       case (_: Running, finished: Finished) =>
@@ -164,7 +165,7 @@ case class BidChampData(
 
   def updateGame(game: Game) = copy(currentGames = currentGames + (game.id -> game))
 
-  def archiveGame(game: Game) = copy(oldGames = game :: oldGames)
+  def archiveGame(game: Game) = copy(oldGames = game :: oldGames, currentGames = currentGames - game.id)
 
   private def justEvents(events: Event*): Result = Result(this, events)
 }
@@ -183,7 +184,7 @@ object BidChampData {
 
     val currentGames = Map(
       "Macbook" -> Game(items("Macbook").item).upsertBid(userIds.head, 534),
-      "Bicycle" -> Game(items("Bicycle").item).upsertBid(userIds.head, 123).upsertBid(userIds(1), 222).upsertBid(userIds(2), 320)
+      "Bicycle" -> Game(items("Bicycle").item).upsertBid(userIds.head, 123).upsertBid(userIds(1), 222).upsertBid(userIds(2), 320).updateStatus()
     )
 
     BidChampData(
@@ -200,10 +201,14 @@ object BidChampData {
 
   case class EventContent(
     body: String,
-    itemId: Option[String]
+    itemId: Option[String],
+    eventType : String = EventContent.SIMPLE_MESSAGE_TYPE
   )
 
   object EventContent {
+    val SIMPLE_MESSAGE_TYPE = "SIMPLE_MESSAGE"
+    val NOTIFICATION_TYPE = "NOTIFICATION"
+
     implicit val eventContentJsonFormat: OFormat[EventContent] = Json.format[EventContent]
   }
 

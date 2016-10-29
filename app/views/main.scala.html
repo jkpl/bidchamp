@@ -26,7 +26,9 @@
         <link rel="stylesheet" href="https://fonts.googleapis.com/css?family=Roboto:300,400,500,700" type="text/css">
         <link rel="stylesheet" href="https://fonts.googleapis.com/icon?family=Material+Icons">
 
+        <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.1.1/jquery.min.js"></script>
         <script src='@routes.Assets.versioned("lib/material-design-lite/material.min.js")'></script>
+        <script src='@routes.Assets.versioned("javascripts/notify.js")'></script>
         <script src='@routes.Assets.versioned("javascripts/hello.js")'></script>
     </head>
     <body>
@@ -48,7 +50,7 @@
             </header>
 
             <div class="mdl-layout__drawer">
-                <span class="mdl-layout-title">BidChamp</span>
+                <div class="bc-logo"></div>
                 <nav class="mdl-navigation">
                 <a class="mdl-navigation__link" href='@controllers.routes.HomeController.index'>Home</a>
                 <a class="mdl-navigation__link" href='@controllers.routes.AdminController.listUsers()'>List Users</a>
