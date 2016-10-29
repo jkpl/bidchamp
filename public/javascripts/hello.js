@@ -7,7 +7,7 @@ sock.onopen = function() {
 sock.onmessage = function(e) {
   console.log('websocket received', e.data);
   var json = JSON.parse(e.data);
-  updateCard(json.items[0].item);
+  updateCard(json.items[0]);
 };
 
 sock.onclose = function() {
