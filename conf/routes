@@ -12,12 +12,11 @@ PUT  /api/user/account              controllers.AuthController.updateAccount()
 POST /api/user/bid                  controllers.BidChampController.bid()
 
 POST /api/user/login                controllers.AuthController.loginPost()
-POST /api/user/logout               controllers.AuthController.logout()
 GET  /api/user                      controllers.AuthController.getUser()
 GET  /api/users                     controllers.AuthController.listUsers()
 
 GET  /signin                        controllers.GithubAuthController.signin()
-GET  /signout                       controllers.GithubAuthController.signin()
+GET  /signout                       controllers.GithubAuthController.signout()
 GET  /callback                      controllers.GithubAuthController.callback(code: String)
 
 GET /login                          controllers.AuthController.login()

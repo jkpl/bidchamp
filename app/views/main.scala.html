@@ -4,7 +4,8 @@
  * two arguments, a `String` for the title of the page and an `Html`
  * object to insert into the body of the page.
  *@
-@(title: String)(content: Html)
+@import model.UserAccount
+@(title: String, user : UserAccount)(content: Html)
 
 <!DOCTYPE html>
 <html lang="en">
@@ -22,13 +23,11 @@
         <link rel="icon" type="image/png" sizes="96x96" href='@routes.Assets.versioned("images/favicon/favicon-96x96.png")'>
 
         <link rel="stylesheet" href='@routes.Assets.versioned("lib/material-design-lite/material.min.css")'>
-        <link rel="stylesheet" href='@routes.Assets.versioned("stylesheets/login.css")'>
         <link rel="stylesheet" href="https://fonts.googleapis.com/css?family=Roboto:300,400,500,700" type="text/css">
         <link rel="stylesheet" href="https://fonts.googleapis.com/icon?family=Material+Icons">
 
-        <script src="//cdn.jsdelivr.net/sockjs/1/sockjs.min.js"></script>
-
         <script src='@routes.Assets.versioned("lib/material-design-lite/material.min.js")'></script>
+        <script src='@routes.Assets.versioned("javascripts/hello.js")'></script>
     </head>
     <body>
 
@@ -40,7 +39,10 @@
                     <span class="mdl-layout-title">BidChamp - Beat the Odds </span>
                         <!-- Add spacer, to align navigation to the right -->
                     <div class="mdl-layout-spacer"></div>
-                    <div class="material-icons mdl-badge">account_box</div>
+                    <div>@{user.name}</div>
+                    <div class="material-icons mdl-badge">
+                        <img src=@{user.avatarURL} alt="some_text" style="width:35px;height:35px;">
+                    </div>
 
                 </div>
             </header>
@@ -50,7 +52,7 @@
                 <nav class="mdl-navigation">
                 <a class="mdl-navigation__link" href='@controllers.routes.HomeController.index'>Home</a>
                 <a class="mdl-navigation__link" href='@controllers.routes.AdminController.listUsers()'>List Users</a>
-                <a class="mdl-navigation__link" href='@controllers.routes.AuthController.logout()'>Logout</a>
+                <a class="mdl-navigation__link" href='@controllers.routes.GithubAuthController.signout()'>Logout</a>
                 </nav>
             </div>
 

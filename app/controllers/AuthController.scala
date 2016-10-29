@@ -49,8 +49,8 @@ class AuthController @Inject() (val userStore: UserStore)
     LoginForm.bindFromRequest.fold(
       _ =>  BadRequest(views.html.login(showFailureAlert = true)),
       loginCredentials =>
-        userStore.loginUser(loginCredentials.username, loginCredentials.password).map { token =>
-          Ok(views.html.index("Happy days!"))
+        userStore.loginUser(loginCredentials.username, loginCredentials.password).map { account =>
+          Ok(views.html.index(account))
         }.getOrElse(NotFound)
     )
   }
@@ -115,10 +115,6 @@ class AuthController @Inject() (val userStore: UserStore)
 //    }
 //      validate.getOrElse(Future.successful(BadRequest))
 //  }
-
-  def logout() = Action.async { implicit request =>
-    Future.successful(Ok)
-  }
 
   def getUser() = withUser { request =>
     logger.info(s"/user - request received")

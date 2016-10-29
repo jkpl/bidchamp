@@ -1,7 +1,9 @@
 package model
 
 import java.util.UUID
+
 import play.api.libs.json._
+import services.MemoryUserStore
 
 case class BidChampData(
   items: Map[String, ItemData] = Map.empty,
@@ -27,7 +29,7 @@ case class BidChampData(
       if game.bids.contains(data.id)
     } yield UserGameState.fromUserData(data, game)
 
-    UserState(data.id, userGames.toList)
+    UserState(data.id, userGames.toList, items.values.toList)
   }
 
   def eval(command: InternalCommand): Result = command match {
@@ -165,6 +167,16 @@ case class BidChampData(
 }
 
 object BidChampData {
+
+  def start: BidChampData = {
+    val items = List(Item("Macbook", 2000), Item("Bicycle", 500), Item("Subaru", 10000))
+
+    BidChampData(
+      items = items.map(item => item.name -> ItemData(item, 0)).toMap,
+      users = MemoryUserStore.users.values.map(_.uuid).map(id => id -> UserData(id)).toMap
+    )
+  }
+
   case class Event(
     targets: Set[UUID],
     content: EventContent
@@ -220,7 +232,8 @@ object BidChampData {
 
 case class UserState(
   user: UUID,
-  games: List[UserGameState]
+  games: List[UserGameState],
+  items: List[ItemData]
 )
 
 object UserState {
