@@ -5,7 +5,8 @@ import java.util.UUID
 
 import play.api.libs.json._
 
-case class Game(id: Long, item : Item, bids : Map[UUID, Int], status : Status) { self =>
+case class Game(item : Item, bids : Map[UUID, Int] = Map.empty, status : Status = NotStarted) { self =>
+  val id = item.name
   val moneyPooled: Int = bids.values.sum
   val itemsToWin: Int = moneyPooled / item.price
   val percentageAchieved: Double = moneyPooled.toDouble / item.price
@@ -53,10 +54,6 @@ case class Game(id: Long, item : Item, bids : Map[UUID, Int], status : Status) {
     case Finished(_, endTime, _) => Some(endTime)
     case _ => None
   }
-}
-
-object Game {
-  def newInstance(id: Long, item : Item) = Game(id, item, Map(), NotStarted)
 }
 
 case class Item(name : String, price : Int)
