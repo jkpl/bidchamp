@@ -4,7 +4,8 @@ import java.util.UUID
 
 import akka.actor._
 import model.BidChampData
-import model.BidChampData.InternalCommand
+
+import scala.concurrent.duration._
 
 object BidChampActor {
   case class Subscribe(uuid: UUID)
@@ -33,19 +34,26 @@ class BidChampActor extends Actor with ActorLogging {
     case GetCurrentState =>
       sender() ! state
 
-    case cmd: InternalCommand =>
+    case cmd: BidChampData.InternalCommand =>
       val result = state.eval(cmd)
       context.become(ready(clients, result.state))
 
-      for {
-        event <- result.events
-        if event.targets.isEmpty
-      } sender() ! event.content
+      if (sender() != self) {
+        for {
+          event <- result.events
+          if event.targets.isEmpty
+        } sender() ! event.content
+      }
 
       for {
         event <- result.events
         target <- event.targets
         client <- clients.get(target)
       } client ! event.content
+  }
+
+  override def preStart(): Unit = {
+    import context.dispatcher
+    context.system.scheduler.schedule(30.seconds, 30.seconds, self, BidChampData.Refresh)
   }
 }
