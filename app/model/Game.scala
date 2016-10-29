@@ -31,8 +31,15 @@ case class Game(id: Long, item : Item, bids : Map[User, Bid], status : Status) {
 
   def upsertBid(user : User, additionalAmount : Int) : Game = {
     val updatedBid = bids.get(user).map(_.increase(additionalAmount)).getOrElse(Bid(additionalAmount))
-    self.copy(bids = self.bids + (user -> updatedBid)).updateStatus()
+    self.copy(bids = self.bids + (user -> updatedBid))
   }
+
+  def isPassive: Boolean = status match {
+    case _: Finished => true
+    case _ => false
+  }
+
+  def isActive: Boolean = !isPassive
 }
 
 object Game {
