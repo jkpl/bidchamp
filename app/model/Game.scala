@@ -23,7 +23,7 @@ case class Game(id: Long, item : Item, bids : Map[User, Bid], status : Status) {
   def updateStatus() : Game = status match {
     case NotStarted if itemsToWin > 1 =>
       self.copy(status = Running(System.currentTimeMillis()))
-    case Running(startTime) if startTime + Game.gameTimeout > System.currentTimeMillis() =>
+    case s: Running if s.endTime < System.currentTimeMillis() =>
       self.copy(status = Finished(DrawWinners(self)))
     case _ =>
       self
@@ -31,13 +31,18 @@ case class Game(id: Long, item : Item, bids : Map[User, Bid], status : Status) {
 
   def upsertBid(user : User, additionalAmount : Int) : Game = {
     val updatedBid = bids.get(user).map(_.increase(additionalAmount)).getOrElse(Bid(additionalAmount))
-    self.copy(bids = self.bids + (user -> updatedBid)).updateStatus()
+    self.copy(bids = self.bids + (user -> updatedBid))
   }
+
+  def isPassive: Boolean = status match {
+    case _: Finished => true
+    case _ => false
+  }
+
+  def isActive: Boolean = !isPassive
 }
 
 object Game {
-  val gameTimeout = (10 * 60 * 1000).toLong // 10 minutes
-
   def newInstance(id: Long, item : Item) = Game(id, item, Map(), NotStarted)
 }
 
@@ -50,5 +55,7 @@ case class Item(name : String, price : Int)
 
 sealed trait Status
 case object NotStarted extends Status
-case class Running(startTime: Long) extends Status
+case class Running(startTime: Long) extends Status {
+  def endTime: Long = startTime + (10 * 60 * 1000).toLong // +10 minutes
+}
 case class Finished(winner : List[User]) extends Status
