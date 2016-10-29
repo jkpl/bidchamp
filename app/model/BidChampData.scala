@@ -119,7 +119,7 @@ case class BidChampData(
             state = updateGame(game.upsertBid(userId, bid.amount)),
             events = List(Event(
               targets = game.bids.keySet - userId,
-              content = EventContent(s"New bid of ${bid.amount} has been added for item ${game.item.toString}.", Some(game.item.name))
+              content = EventContent(s"New bid of ${bid.amount} has been added for item ${game.item.toString}.", Some(game.item.name), EventContent.NOTIFICATION_TYPE)
             ))
           )
         case Some(game) =>
@@ -200,10 +200,14 @@ object BidChampData {
 
   case class EventContent(
     body: String,
-    itemId: Option[String]
+    itemId: Option[String],
+    eventType : String = EventContent.SIMPLE_MESSAGE_TYPE
   )
 
   object EventContent {
+    val SIMPLE_MESSAGE_TYPE = "SIMPLE_MESSAGE"
+    val NOTIFICATION_TYPE = "NOTIFICATION"
+
     implicit val eventContentJsonFormat: OFormat[EventContent] = Json.format[EventContent]
   }
 

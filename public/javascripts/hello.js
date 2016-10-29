@@ -7,7 +7,12 @@ sock.onopen = function() {
 sock.onmessage = function(e) {
   console.log('websocket received', e.data);
   var json = JSON.parse(e.data);
-  updateCard(json.items[1]);
+  if (typeof json.items != 'undefined'){
+    updateCard(json.items[1]);
+  }
+  if (json.eventType === 'NOTIFICATION'){
+    $.notify(json.body, "success");
+  }
 };
 
 sock.onclose = function() {
