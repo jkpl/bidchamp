@@ -8,18 +8,15 @@ scalaVersion := "2.11.7"
 
 
 val miscDependencies = Seq(
-  "com.google.api-client" % "google-api-client" % "1.22.0",
-  "com.jason-goodwin" %% "authentikat-jwt" % "0.4.1",
-  "com.pauldijou" %% "jwt-play-json" % "0.9.0"
+  "org.webjars" %% "webjars-play" % "2.5.0",
+  "org.webjars.bower" % "material-design-lite" % "1.1.3"
 )
-
-resolvers += "Atlassian Releases" at "https://maven.atlassian.com/public/"
 
 libraryDependencies ++= Seq(
   jdbc,
   cache,
   ws,
   "org.scalatestplus.play" %% "scalatestplus-play" % "1.5.1" % Test
-)
+) ++ miscDependencies
 
 

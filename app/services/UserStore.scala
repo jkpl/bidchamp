@@ -34,7 +34,10 @@ trait UserStore {
 @Singleton
 class MemoryUserStore extends UserStore {
 
-  var users: Map[String, UserAccount] = Map.empty
+  var users: Map[String, UserAccount] = Map( "omelois@cakesolutions.net" -> UserAccount(UUID.randomUUID(),"Olivier","omelois@cakesolutions.net","Olivier",""),
+    "jakkop@cakesolutions.net" -> UserAccount(UUID.randomUUID(),"Jakko","omelois@cakesolutions.net","Jakkos",""),
+    "andrews@cakesolutions.net" -> UserAccount(UUID.randomUUID(),"Andrew","omelois@cakesolutions.net","Andrew",""),
+    "michalj@cakesolutions.net" -> UserAccount(UUID.randomUUID(),"Michal","michalj@cakesolutions.net","Michal",""))
   var tokenCache: Map[UUID, String] = Map.empty
 
   def listUsers(): Seq[UserAccount] = users.values.toSeq
