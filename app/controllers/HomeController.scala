@@ -18,8 +18,8 @@ class HomeController @Inject()(val userStore : UserStore) extends Controller wit
    * will be called when the application receives a `GET` request with
    * a path of `/`.
    */
-  def index = withUser.apply{
-    Ok(views.html.index("Your new application is ready."))
+  def index = withUser { (r: UserSessionRequest[AnyContent]) =>
+    Ok(views.html.index(r.userAccount))
   }
 
 

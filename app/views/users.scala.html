@@ -1,7 +1,7 @@
 @import model.UserAccount
-@(users: Seq[UserAccount])
+@(user : UserAccount, users: Seq[UserAccount])
 
-@main("List user application") {
+@main("List user application", user) {
 
     <ul>
     @for(user <- users) {
