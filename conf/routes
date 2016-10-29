@@ -18,6 +18,10 @@ POST /api/user/login                controllers.AuthController.login()
 POST /api/user/logout               controllers.AuthController.logout()
 GET  /api/user                      controllers.AuthController.getUser()
 
+GET  /signin                        controllers.GithubAuthController.signin()
+GET  /signout                       controllers.GithubAuthController.signin()
+GET  /callback                      controllers.GithubAuthController.callback(code: String)
+
 
 
 # Map static resources from the /public folder to the /assets URL path
