@@ -4,7 +4,7 @@ import services.DrawWinners
 
 import java.util.UUID
 
-case class Game(item : Item, bids : Map[Player, Bid], status : Status) { self =>
+case class Game(id: Long, item : Item, bids : Map[Player, Bid], status : Status) { self =>
   val moneyPooled: Int = bids.map(_._2.amount).sum
   val itemsToWin: Int = moneyPooled / item.price
   val percentageAchieved: Double = moneyPooled.toDouble / item.price
@@ -38,7 +38,7 @@ case class Game(item : Item, bids : Map[Player, Bid], status : Status) { self =>
       case _ => true
     }
     val teamBid = bids.collect {
-      case (u@User(_,_), bid) if members.contains(u) => bid.amount
+      case (u: User, bid) if members.contains(u) => bid.amount
     }.sum
 
     self.copy(bids = notInTeam + (Team(teamName, members) -> Bid(teamBid))).updateStatus()
@@ -58,7 +58,7 @@ case class Game(item : Item, bids : Map[Player, Bid], status : Status) { self =>
 object Game {
   val gameTimeout = (10 * 60 * 1000).toLong // 10 minutes
 
-  def newInstance(item : Item) = Game(item, Map(), NotStarted)
+  def newInstance(id: Long, item : Item) = Game(id, item, Map(), NotStarted)
 }
 
 sealed trait Player {
