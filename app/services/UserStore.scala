@@ -13,6 +13,8 @@ import scala.concurrent.Future
 
 trait UserStore {
 
+  def listUsers(): Seq[UserAccount]
+
   def getUser(email: String): Option[UserAccount]
 
   def upsertUser(userAccount: UserAccount): UserAccount
@@ -34,6 +36,8 @@ class MemoryUserStore extends UserStore {
   var users: Map[String, UserAccount] = Map.empty
 
   var tokenCache: Map[UUID, String] = Map.empty
+
+  def listUsers(): Seq[UserAccount] = users.values.toSeq
 
   def getUser(email: String): Option[UserAccount] =  users.get(email)
 
