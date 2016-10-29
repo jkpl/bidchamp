@@ -193,9 +193,10 @@
 
  <div class="demo-card-wide mdl-card mdl-shadow--2dp">
   <div class="mdl-card__title">
-   <h2 class="mdl-card__title-text">Apple Macbook</h2>
+   <h2 class="mdl-card__title-text" id="item-name">Apple Macbook</h2>
+   <h2 class="mdl-card__title-text" id="item-price">£1200</h2>
   </div>
-  <div class="mdl-card__supporting-text">
+  <div class="mdl-card__supporting-text" id="item-description">
    Test this.
   </div>
  </div>
@@ -208,17 +209,16 @@
   <div class="mdl-cell mdl-cell--2-col">
    <div class="card-probability mdl-card mdl-shadow--2dp">
     <div class="mdl-card__title mdl-card--expand">
-     <span>Probability</span>
-     <h2>
-      11 %
-     </h2>
+     <h4 id="item-odds">
+      11:00
+     </h4>
     </div>
    </div>
   </div>
   <div class="mdl-cell mdl-cell--2-col">
    <div class="card-time mdl-card mdl-shadow--2dp">
     <div class="mdl-card__title mdl-card--expand">
-     <h4>
+     <h4 id="item-time-left">
       11:00
      </h4>
     </div>
@@ -258,19 +258,6 @@
   </div>
  </div>
 
-
-
- <script>
-         var sock = new SockJS('http://localhost:9000/socket');
-         sock.onopen = function() {
-          console.log('open');
-         };
-         sock.onmessage = function(e) {
-          console.log('message', e.data);
-         };
-         sock.onclose = function() {
-          console.log('close');
-         }
- </script>
+ <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.1.1/jquery.min.js"></script>
 
 }
