@@ -9,14 +9,13 @@ GET     /socket                     controllers.BidChampController.socket
 
 
 POST /api/user/account              controllers.AuthController.createUserAccount()
-
-POST /api/user/password/request     controllers.PasswordController.newPasswordResetRequest
-POST /api/user/password/verify      controllers.PasswordController.newPasswordResetVerify
-POST /api/user/password/reset       controllers.PasswordController.newPasswordReset
+PUT  /api/user/account              controllers.AuthController.updateAccount()
+POST /api/user/bid                  controllers.BidChampController.bid()
 
 POST /api/user/login                controllers.AuthController.login()
 POST /api/user/logout               controllers.AuthController.logout()
 GET  /api/user                      controllers.AuthController.getUser()
+GET  /api/users                     controllers.AuthController.listUsers()
 
 GET  /signin                        controllers.GithubAuthController.signin()
 GET  /signout                       controllers.GithubAuthController.signin()

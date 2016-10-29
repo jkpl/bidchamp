@@ -55,7 +55,8 @@ case class Item(name : String, price : Int)
 
 sealed trait Status
 case object NotStarted extends Status
-case class Running(startTime: Long) extends Status {
-  def endTime: Long = startTime + (10 * 60 * 1000).toLong // +10 minutes
+case class Running(startTime: Long, endTime: Long) extends Status
+object Running {
+  def apply(startTime: Long): Running = Running(startTime, startTime + (10 * 60 * 1000).toLong) // +10 minutes
 }
 case class Finished(winner : List[User]) extends Status

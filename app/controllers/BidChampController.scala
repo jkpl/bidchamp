@@ -5,18 +5,27 @@ import javax.inject._
 import actors.WebSocketActor
 import akka.actor.ActorSystem
 import akka.stream.Materializer
-import play.api.libs.json.JsValue
+import model.UserUpdate
+import play.api.Logger
+import play.api.libs.json.{JsValue, Json}
 import play.api.libs.streams.ActorFlow
 import play.api.mvc._
-import services.BidChampCore
+import services.{BidChampCore, UserStore}
 
 import scala.concurrent.Future
+import scala.util.Try
 
 @Singleton
 class BidChampController @Inject()(
-  bidChamp: BidChampCore
+  bidChamp: BidChampCore, val userStore: UserStore
 )(implicit system: ActorSystem, materializer: Materializer)
-    extends Controller {
+    extends Controller with Authorization {
+
+  val logger: Logger = Logger(this.getClass)
+
+  case class Bid(item: String, cash: BigDecimal, currency: String = "LIB")
+
+  implicit val fmtBid = Json.format[Bid]
 
   def state = Action { Ok("Cool story bro") }
 
@@ -29,5 +38,24 @@ class BidChampController @Inject()(
     })
   }
 
+  def bid() = withUser(parse.json) {
+    implicit request =>
+    val parse = request.body
+      .validate[Bid]
+      .fold(
+        errors => {
+          val errMsg = "/bid - unable to parse request body" + errors.mkString(", ")
+          logger.error(errMsg)
+          Try(throw new RuntimeException(errMsg))
+        },
+        valid => Try(valid)
+      )
+
+      parse.toOption.map { bid: Bid =>
+        bidChamp.gameActor ! bid
+        Ok
+      }.getOrElse(BadRequest)
+
+  }
 
 }

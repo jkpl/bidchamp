@@ -13,6 +13,8 @@ import scala.concurrent.Future
 
 trait UserStore {
 
+  def listUsers(): Seq[UserAccount]
+
   def getUser(email: String): Option[UserAccount]
 
   def upsertUser(userAccount: UserAccount): UserAccount
@@ -26,6 +28,7 @@ trait UserStore {
   def getUserByToken(token: UUID): Option[UserAccount]
 
   def validSession(token: UUID): Boolean
+
 }
 
 @Singleton
@@ -34,6 +37,8 @@ class MemoryUserStore extends UserStore {
   var users: Map[String, UserAccount] = Map.empty
 
   var tokenCache: Map[UUID, String] = Map.empty
+
+  def listUsers(): Seq[UserAccount] = users.values.toSeq
 
   def getUser(email: String): Option[UserAccount] =  users.get(email)
 
@@ -56,5 +61,6 @@ class MemoryUserStore extends UserStore {
   def getUserByToken(token: UUID) = tokenCache.get(token).flatMap(email => users.get(email))
 
   def validSession(token: UUID) = tokenCache.keys.exists(tk => tk == token)
+
 }
 

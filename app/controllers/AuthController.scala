@@ -4,13 +4,12 @@ package controllers
 import java.util.UUID
 import javax.inject.{Inject, Singleton}
 
-import com.typesafe.config.Config
-import model.{UserAccount, UserRegistration}
+import model.{UserAccount, UserRegistration, UserUpdate}
 import org.joda.time.DateTime
 import play.api.Logger
 import play.api.mvc._
 
-import scala.concurrent.{ExecutionContext, Future}
+import scala.concurrent.Future
 import scala.util.Try
 import model.UserAccount._
 import play.api.libs.json.Json
@@ -82,11 +81,12 @@ class AuthController @Inject() (val userStore: UserStore)
             Cookie(
               name = SessionTokenCookieName,
               value = token.toString,
-              domain = cookieDomain
+              domain = cookieDomain,
+              maxAge = Some(86400),
+              secure = true
             )
           )
         }
-
       }
     }
       validate.getOrElse(Future.successful(BadRequest))
@@ -101,9 +101,36 @@ class AuthController @Inject() (val userStore: UserStore)
 
     Ok(Json.toJson(userStore.getUserByToken(UUID.fromString(request.sessionToken))))
   }
+
+  def listUsers() = Action {
+    Ok(Json.toJson(userStore.listUsers().map(_.email)))
+  }
+
+  def updateAccount() = withUser(parse.json) {
+    implicit request =>
+      val parse = request.body
+        .validate[UserUpdate]
+        .fold(
+          errors => {
+            val errMsg = "/updateUser - unable to parse request body" + errors.mkString(", ")
+            logger.error(errMsg)
+            Try(throw new RuntimeException(errMsg))
+          },
+          valid => Try(valid)
+        )
+
+      val validate = parse.toOption.map { userUpdate: UserUpdate =>
+
+        val updatedAccount = request.userAccount.copy(name = Some(userUpdate.name), passwordInfo = userUpdate.password, phoneNumber = userUpdate.phoneNumber)
+        userStore.upsertUser(updatedAccount)
+
+            Created
+      }
+      validate.getOrElse(BadRequest)
+  }
 }
 
-trait  Authorization extends Results {
+trait Authorization extends Results {
 
   private val SessionTokenCookieName = "session-token"
 
