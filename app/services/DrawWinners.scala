@@ -1,15 +1,17 @@
 package services
 
-import model.{Bid, Game, User}
+import java.util.UUID
+
+import model.Game
 
 import scala.util.Random
 
 object DrawWinners {
 
-  def apply(game: Game): List[User] = drawMultiple(game)
+  def apply(game: Game): List[UUID] = drawMultiple(game)
 
   private def drawMultiple(game: Game) = {
-    def iter(itemsLeft: Int, bids: Map[User, Bid], winners: List[User]): List[User] =
+    def iter(itemsLeft: Int, bids: Map[UUID, Int], winners: List[UUID]): List[UUID] =
       if (itemsLeft == 0) winners
       else {
         val winner = drawOne(bids)
@@ -20,13 +22,13 @@ object DrawWinners {
     iter(game.itemsToWin, game.bids, Nil)
   }
 
-  private def drawOne(bids: Iterable[(User, Bid)]): User = {
-    val max = bids.map(_._2.amount).sum
+  private def drawOne(bids: Map[UUID, Int]): UUID = {
+    val max = bids.values.sum
     val winningNumber = Random.nextInt(max)
 
     val players = for {
       (player, bid) <- bids
-      _ <- 1 to bid.amount
+      _ <- 1 to bid
     } yield player
 
     players.toVector(winningNumber)

@@ -27,6 +27,7 @@ class BidChampActor extends Actor with ActorLogging {
   private def ready(clients: Map[UUID, ActorRef], state: BidChampData): Receive = {
     case Subscribe(uuid) =>
       context.become(ready(clients + (uuid -> sender()), state))
+      state.userStateForId(uuid).foreach(sender() ! _)
 
     case Unsubscribe =>
       context.become(ready(clients.filter(_._2 == sender()), state))
@@ -50,6 +51,11 @@ class BidChampActor extends Actor with ActorLogging {
         target <- event.targets
         client <- clients.get(target)
       } client ! event.content
+
+      for {
+        userState <- result.state.userStates
+        client <- clients.get(userState.user)
+      } client ! userState
   }
 
   override def preStart(): Unit = {
