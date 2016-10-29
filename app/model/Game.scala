@@ -4,13 +4,13 @@ import services.DrawWinners
 
 import java.util.UUID
 
-case class Game(id: Long, item : Item, bids : Map[User, Bid], status : Status) { self =>
+case class Game(id: Long, item : Item, bids : Map[UUID, Bid], status : Status) { self =>
   val moneyPooled: Int = bids.map(_._2.amount).sum
   val itemsToWin: Int = moneyPooled / item.price
   val percentageAchieved: Double = moneyPooled.toDouble / item.price
   val exceedAmount: Int = bids.values.map(_.amount).sum % item.price
 
-  def winningChances: Map[User, Double] =
+  def winningChances: Map[UUID, Double] =
     bids.mapValues { bid =>
       val divisor = itemsToWin match {
         case 0 => item.price // not enough money pooled yet
@@ -29,7 +29,7 @@ case class Game(id: Long, item : Item, bids : Map[User, Bid], status : Status) {
       self
   }
 
-  def upsertBid(user : User, additionalAmount : Int) : Game = {
+  def upsertBid(user : UUID, additionalAmount : Int) : Game = {
     val updatedBid = bids.get(user).map(_.increase(additionalAmount)).getOrElse(Bid(additionalAmount))
     self.copy(bids = self.bids + (user -> updatedBid))
   }
@@ -46,8 +46,6 @@ object Game {
   def newInstance(id: Long, item : Item) = Game(id, item, Map(), NotStarted)
 }
 
-case class User(name : String, uuid: UUID = UUID.randomUUID())
-
 case class Bid(amount : Int) {
   def increase(a: Int): Bid = Bid(amount + a)
 }
@@ -59,4 +57,4 @@ case class Running(startTime: Long, endTime: Long) extends Status
 object Running {
   def apply(startTime: Long): Running = Running(startTime, startTime + (10 * 60 * 1000).toLong) // +10 minutes
 }
-case class Finished(winner : List[User]) extends Status
+case class Finished(winner : List[UUID]) extends Status
