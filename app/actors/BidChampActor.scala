@@ -60,6 +60,6 @@ class BidChampActor extends Actor with ActorLogging {
 
   override def preStart(): Unit = {
     import context.dispatcher
-    context.system.scheduler.schedule(30.seconds, 30.seconds, self, BidChampData.Refresh)
+    context.system.scheduler.schedule(10.seconds, 10.seconds, self, BidChampData.Refresh)
   }
 }
