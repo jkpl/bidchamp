@@ -91,6 +91,7 @@ case class BidChampData(
         addItems(updatedItems)
           .archiveGame(game)
           .copy(users = updatedUsers, charity = charity + game.exceedAmount)
+
       case _ =>
         this
     }
@@ -164,7 +165,7 @@ case class BidChampData(
 
   def updateGame(game: Game) = copy(currentGames = currentGames + (game.id -> game))
 
-  def archiveGame(game: Game) = copy(oldGames = game :: oldGames)
+  def archiveGame(game: Game) = copy(oldGames = game :: oldGames, currentGames = currentGames - game.id)
 
   private def justEvents(events: Event*): Result = Result(this, events)
 }
