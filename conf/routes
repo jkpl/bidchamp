@@ -5,6 +5,8 @@
 # Main routes
 GET     /                           controllers.HomeController.index
 GET     /state                      controllers.BidChampController.state
+GET     /socket                     controllers.BidChampController.socket
+
 
 POST /api/user/account              controllers.AuthController.createUserAccount()
 
