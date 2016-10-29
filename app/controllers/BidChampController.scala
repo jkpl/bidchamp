@@ -1,11 +1,11 @@
 package controllers
 
+import java.util.UUID
 import javax.inject._
 
 import actors.WebSocketActor
 import akka.actor.ActorSystem
 import akka.stream.Materializer
-import model.UserUpdate
 import play.api.Logger
 import play.api.libs.json.{JsValue, Json}
 import play.api.libs.streams.ActorFlow
@@ -31,11 +31,16 @@ class BidChampController @Inject()(
 
   def socket = WebSocket.acceptOrResult[JsValue, JsValue] { request =>
     println(request)
-    Future.successful(request.session.get("user") match {
-//      case None => Left(Forbidden)
-      case x : Any =>
-        Right(ActorFlow.actorRef(out => WebSocketActor.props(out, bidChamp.gameActor)))
-    })
+
+    Future.successful {
+      val flow = for {
+        tokenString <- request.session.get("session-token")
+        token <- parseUuid(tokenString)
+        userAccount <- userStore.getUserByToken(token)
+      } yield ActorFlow.actorRef(out => WebSocketActor.props(userAccount.uuid, out, bidChamp.gameActor))
+
+      flow.toRight(Forbidden)
+    }
   }
 
   def bid() = withUser(parse.json) {
@@ -58,4 +63,5 @@ class BidChampController @Inject()(
 
   }
 
+  def parseUuid(s: String): Option[UUID] = Try(UUID.fromString(s)).toOption
 }
