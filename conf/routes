@@ -7,7 +7,6 @@ GET     /                           controllers.HomeController.index
 GET     /state                      controllers.BidChampController.state
 GET     /socket                     controllers.BidChampController.socket
 
-
 POST /api/user/account              controllers.AuthController.createUserAccount()
 PUT  /api/user/account              controllers.AuthController.updateAccount()
 POST /api/user/bid                  controllers.BidChampController.bid()
@@ -20,6 +19,7 @@ GET  /api/users                     controllers.AuthController.listUsers()
 GET  /signin                        controllers.GithubAuthController.signin()
 GET  /signout                       controllers.GithubAuthController.signin()
 GET  /callback                      controllers.GithubAuthController.callback(code: String)
+
 
 
 
