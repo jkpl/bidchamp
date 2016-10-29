@@ -49,8 +49,8 @@ object BidChampData {
   sealed trait Command
   object Command {
     implicit val reads : Reads[Command] = new Reads[Command]{
-      override def reads(json: JsValue): JsResult[Command] = json \ "command" match {
-        case JsString("addUser") => (json \ "payload").validate[AddUser]
+      override def reads(json: JsValue): JsResult[Command] = (json \ "command").validate[String].flatMap {
+        case "addUser" => (json \ "payload").validate[AddUser]
         case _ => JsError.apply("Command not recognised")
       }
     }
@@ -66,9 +66,9 @@ object BidChampData {
   }
   object AuthCommand {
     implicit val reads : Reads[AuthCommand] = new Reads[AuthCommand]{
-      override def reads(json: JsValue): JsResult[AuthCommand] = json \ "command" match {
-        case JsString("startBid") => (json \ "payload").validate[StartBid]
-        case JsString("addToBid") => (json \ "payload").validate[AddToBid]
+      override def reads(json: JsValue): JsResult[AuthCommand] = (json \ "command").validate[String].flatMap {
+        case "startBid" => (json \ "payload").validate[StartBid]
+        case "addToBid" => (json \ "payload").validate[AddToBid]
         case _ => JsError.apply("Command not recognised")
       }
     }
