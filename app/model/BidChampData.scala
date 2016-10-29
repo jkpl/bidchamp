@@ -16,7 +16,19 @@ case class BidChampData(
 
   def evalCommand(command: Command): Result = command match {
     case Refresh =>
-      justEvents("lollerz")
+      val updates = games.mapValues { game =>
+        val updatedGame = game.updateStatus()
+        val events = gameUpdateToEvents(game, updatedGame)
+        (updatedGame, events)
+      }
+
+      val updatedGames = updates.mapValues(_._1)
+      val events = updates.values.toList.flatMap(_._2)
+
+      Result(
+        copy(games = updatedGames),
+        events
+      )
 
     case AddUser(username) =>
       if (users.values.exists(_.user.name == username))
@@ -54,14 +66,17 @@ case class BidChampData(
       games.get(bid.game) match {
         case None => justEvents(s"No game #${bid.game} found.")
         case Some(game) if game.isActive =>
-          val updatedGame = game.upsertBid(user, bid.amount)
           Result(
-            updateGame(updatedGame),
+            updateGame(game.upsertBid(user, bid.amount)),
             List(s"User '${user.name}' bid ${bid.amount} for item ${game.item.toString}.")
           )
         case Some(game) =>
           justEvents(s"Can't bid on finished games.")
       }
+  }
+
+  private def gameUpdateToEvents(oldGame: Game, updatedGame: Game): List[Event] = {
+    Nil // TODO
   }
 
   private def updateGame(game: Game) = copy(games = games + (game.id -> game))
