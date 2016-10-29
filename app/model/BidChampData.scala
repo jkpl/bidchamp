@@ -136,7 +136,7 @@ case class BidChampData(
       case (NotStarted, _: Running) =>
         List(Event(
           targets = bidders,
-          content = EventContent(s"The bid for '$itemName' has started! ~10 minutes until winners are drawn!", Some(gameId))
+          content = EventContent(s"The bid for '$itemName' has started! ~1 minute until winners are drawn!", Some(gameId))
         ))
 
       case (_: Running, finished: Finished) =>
@@ -183,7 +183,7 @@ object BidChampData {
 
     val currentGames = Map(
       "Macbook" -> Game(items("Macbook").item).upsertBid(userIds.head, 534),
-      "Bicycle" -> Game(items("Bicycle").item).upsertBid(userIds.head, 123).upsertBid(userIds(1), 222).upsertBid(userIds(2), 320)
+      "Bicycle" -> Game(items("Bicycle").item).upsertBid(userIds.head, 123).upsertBid(userIds(1), 222).upsertBid(userIds(2), 320).updateStatus()
     )
 
     BidChampData(
