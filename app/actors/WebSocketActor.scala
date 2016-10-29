@@ -1,7 +1,7 @@
 package actors
 
 import akka.actor._
-import model.BidChampData.{AuthCommand, Command}
+import model.BidChampData.Command
 import play.api.libs.json.{JsString, JsValue, Reads}
 
 
@@ -21,15 +21,10 @@ case class JsExtractor[T](implicit reads : Reads[T]){
   */
 class WebSocketActor(out: ActorRef, gameActor : ActorRef) extends Actor {
   val commandExtractor = JsExtractor[Command]()
-  val authCommandExtractor = JsExtractor[AuthCommand]()
 
 
   def receive = {
     case commandExtractor(command) =>
-      println(command)
-      out ! JsString("I received your command: " + command.toString)
-
-    case authCommandExtractor(command) =>
       println(command)
       out ! JsString("I received your auth command: " + command.toString)
 
