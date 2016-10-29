@@ -17,7 +17,7 @@ class GameActor() extends Actor {
   }
 
 
-  override def receive: Receive = state(Game.newInstance(Item("car", 100)))
+  override def receive: Receive = state(Game.newInstance(scala.util.Random.nextLong(), Item("car", 100)))
 
   override def postStop() = {}
 }

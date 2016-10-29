@@ -13,7 +13,7 @@ object WebSocketActor {
 class WebSocketActor(out: ActorRef, gameActor : ActorRef) extends Actor {
   def receive = {
     case msg: JsValue =>
-      out ! JsString("I received your message: " + msg)
+      out ! JsString("I received your message: " + msg.toString())
   }
 
   override def postStop() = {

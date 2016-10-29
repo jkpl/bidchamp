@@ -1,5 +1,7 @@
 package model
 
+import play.api.libs.json._
+
 case class BidChampData(
   items: Map[String, Item] = Map.empty,
   users: Map[String, UserData] = Map.empty,
@@ -45,13 +47,40 @@ object BidChampData {
   type Result = (BidChampData, Seq[Event])
 
   sealed trait Command
-  sealed trait AuthCommand {
-    def user: String
+  object Command {
+    implicit val reads : Reads[Command] = new Reads[Command]{
+      override def reads(json: JsValue): JsResult[Command] = json \ "command" match {
+        case JsString("addUser") => (json \ "payload").validate[AddUser]
+        case _ => JsError.apply("Command not recognised")
+      }
+    }
   }
 
   case class AddUser(username: String) extends Command
+  object AddUser {
+    implicit val json: OFormat[AddUser] = Json.format[AddUser]
+  }
+
+  sealed trait AuthCommand {
+    def user: String
+  }
+  object AuthCommand {
+    implicit val reads : Reads[AuthCommand] = new Reads[AuthCommand]{
+      override def reads(json: JsValue): JsResult[AuthCommand] = json \ "command" match {
+        case JsString("startBid") => (json \ "payload").validate[StartBid]
+        case JsString("addToBid") => (json \ "payload").validate[AddToBid]
+        case _ => JsError.apply("Command not recognised")
+      }
+    }
+  }
   case class StartBid(user: String, item: String, amount: Int) extends AuthCommand
+  object StartBid {
+    implicit val json: OFormat[StartBid] = Json.format[StartBid]
+  }
   case class AddToBid(user: String, game: Long, amount: Int) extends AuthCommand
+  object AddToBid {
+    implicit val json: OFormat[AddToBid] = Json.format[AddToBid]
+  }
 }
 
 case class UserData(

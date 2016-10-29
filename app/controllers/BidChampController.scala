@@ -21,9 +21,11 @@ class BidChampController @Inject()(
   def state = Action { Ok("Cool story bro") }
 
   def socket = WebSocket.acceptOrResult[JsValue, JsValue] { request =>
+    println(request)
     Future.successful(request.session.get("user") match {
-      case None => Left(Forbidden)
-      case Some(_) => Right(ActorFlow.actorRef(out => WebSocketActor.props(out, bidChamp.gameActor)))
+//      case None => Left(Forbidden)
+      case x : Any =>
+        Right(ActorFlow.actorRef(out => WebSocketActor.props(out, bidChamp.gameActor)))
     })
   }
 
