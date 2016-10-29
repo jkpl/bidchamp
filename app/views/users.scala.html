@@ -1,0 +1,11 @@
+@import model.UserAccount
+@(users: Seq[UserAccount])
+
+@main("List user application") {
+
+    <ul>
+    @for(user <- users) {
+        <li>@user.email</li>
+    }
+    </ul>
+}
