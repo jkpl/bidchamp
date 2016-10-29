@@ -1,14 +1,16 @@
 package services
 
-import java.util.concurrent.atomic.AtomicInteger
 import javax.inject._
 
+import common.AtomicRef
+
 trait BidChampCore {
-  def nextCount(): Int
+  def nextState(): Int
 }
 
 @Singleton
 class AtomicBidChampCore extends BidChampCore {
-  private val atomicCounter = new AtomicInteger()
-  override def nextCount(): Int = atomicCounter.getAndIncrement()
+  private val ref = new AtomicRef[Int](0)
+
+  override def nextState(): Int = ref.update(_ + 1)
 }

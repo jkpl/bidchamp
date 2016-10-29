@@ -9,5 +9,5 @@ import services.BidChampCore
 @Singleton
 class BidChampController @Inject() (bidChamp: BidChampCore) extends Controller {
 
-  def count = Action { Ok(bidChamp.nextCount().toString) }
+  def state = Action { Ok(bidChamp.nextState().toString) }
 }
