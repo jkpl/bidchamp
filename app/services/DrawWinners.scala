@@ -9,9 +9,6 @@ object DrawWinners {
   def apply(game: Game): List[Player] = drawMultiple(game)
 
   private def drawMultiple(game: Game) = {
-    val max = game.bids.map(_._2.amount).sum
-    val itemsToWin = max / game.item.price
-
     def iter(itemsLeft: Int, bids: Map[Player, Bid], winners: List[Player]): List[Player] =
       if (itemsLeft == 0) winners
       else {
@@ -20,7 +17,7 @@ object DrawWinners {
         iter(itemsLeft - 1, nextBids, winner :: winners)
       }
 
-    iter(itemsToWin, game.bids, Nil)
+    iter(game.itemsToWin, game.bids, Nil)
   }
 
   private def drawOne(bids: Iterable[(Player, Bid)]): Player = {
