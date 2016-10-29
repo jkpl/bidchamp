@@ -29,15 +29,15 @@ trait UserStore {
 
   def validSession(token: UUID): Boolean
 
+  def loginUser(username: String, password: String): Option[UserAccount]
+
 }
 
 @Singleton
 class MemoryUserStore extends UserStore {
 
-  var users: Map[String, UserAccount] = Map( "omelois@cakesolutions.net" -> UserAccount(UUID.randomUUID(),"Olivier","omelois@cakesolutions.net","Olivier",""),
-    "jakkop@cakesolutions.net" -> UserAccount(UUID.randomUUID(),"Jakko","omelois@cakesolutions.net","Jakkos",""),
-    "andrews@cakesolutions.net" -> UserAccount(UUID.randomUUID(),"Andrew","omelois@cakesolutions.net","Andrew",""),
-    "michalj@cakesolutions.net" -> UserAccount(UUID.randomUUID(),"Michal","michalj@cakesolutions.net","Michal",""))
+  import MemoryUserStore._
+
   var tokenCache: Map[UUID, String] = Map.empty
 
   def listUsers(): Seq[UserAccount] = users.values.toSeq
@@ -66,5 +66,15 @@ class MemoryUserStore extends UserStore {
 
   def validSession(token: UUID) = tokenCache.keys.exists(tk => tk == token)
 
+  def loginUser(username: String, password: String): Option[UserAccount] = users.get(username).collect{case user if user.password.contains(password) => user}
+
 }
 
+object MemoryUserStore {
+  var users: Map[String, UserAccount] = Map(
+    "omelois@cakesolutions.net" -> UserAccount(UUID.randomUUID(),"Olivier","omelois@cakesolutions.net","Olivier",""),
+    "jaakkop@cakesolutions.net" -> UserAccount(UUID.randomUUID(),"Jaakko","jaakkop@cakesolutions.net","Jaakko",""),
+    "andrews@cakesolutions.net" -> UserAccount(UUID.randomUUID(),"Andrew","andrews@cakesolutions.net","Andrew",""),
+    "michalj@cakesolutions.net" -> UserAccount(UUID.randomUUID(),"Michal","michalj@cakesolutions.net","Michal","")
+  )
+}

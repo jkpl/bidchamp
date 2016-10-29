@@ -22,7 +22,7 @@ class BidChampActor extends Actor with ActorLogging {
 
   import BidChampActor._
 
-  override def receive: Receive = ready(Map.empty, BidChampData())
+  override def receive: Receive = ready(Map.empty, BidChampData.start)
 
   private def ready(clients: Map[UUID, ActorRef], state: BidChampData): Receive = {
     case Subscribe(uuid) =>
