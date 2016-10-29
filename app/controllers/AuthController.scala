@@ -12,6 +12,8 @@ import play.api.mvc._
 import scala.concurrent.Future
 import scala.util.Try
 import model.UserAccount._
+import play.api.data.Form
+import play.api.data.Forms._
 import play.api.libs.json.Json
 import services.UserStore
 
@@ -30,6 +32,29 @@ class AuthController @Inject() (val userStore: UserStore)
   case class LoginCredentials(username: String, password: String)
 
   implicit val fmtLoginCredentials = Json.format[LoginCredentials]
+
+  private val LoginForm = Form(
+    mapping(
+      "username" -> nonEmptyText,
+      "password" -> nonEmptyText
+    )(LoginCredentials.apply)(LoginCredentials.unapply)
+  )
+
+
+  def login() = Action(
+    Ok(views.html.login())
+  )
+
+  def loginPost() = Action{ implicit request =>
+    LoginForm.bindFromRequest.fold(
+      _ =>  BadRequest(views.html.login(showFailureAlert = true)),
+      loginCredentials =>
+        userStore.loginUser(loginCredentials.username, loginCredentials.password).map { token =>
+          Ok(views.html.index("Happy days!"))
+        }.getOrElse(NotFound)
+    )
+  }
+
 
   def createUserAccount() = Action.async(parse.json) { implicit request =>
     println(request.body)

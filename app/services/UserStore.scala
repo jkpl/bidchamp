@@ -29,6 +29,8 @@ trait UserStore {
 
   def validSession(token: UUID): Boolean
 
+  def loginUser(username: String, password: String): Option[UserAccount]
+
 }
 
 @Singleton
@@ -65,6 +67,8 @@ class MemoryUserStore extends UserStore {
   def getUserByToken(token: UUID) = tokenCache.get(token).flatMap(email => users.get(email))
 
   def validSession(token: UUID) = tokenCache.keys.exists(tk => tk == token)
+
+  def loginUser(username: String, password: String): Option[UserAccount] = users.get(username).collect{case user if user.password.contains(password) => user}
 
 }
 

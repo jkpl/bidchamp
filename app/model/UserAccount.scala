@@ -10,7 +10,8 @@ case class UserAccount(
                         login : String,
                         email: String,
                         name: String,
-                        avatarURL : String
+                        avatarURL : String,
+                        password: Option[String] = None
                       )
 
 case class UserRegistration(email: String, name: String, password: String, phoneNumber: Option[String])
