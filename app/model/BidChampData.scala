@@ -172,11 +172,24 @@ case class BidChampData(
 object BidChampData {
 
   def start: BidChampData = {
-    val items = List(Item("Macbook", 2000), Item("Bicycle", 500), Item("Subaru", 10000))
+    val items = List(
+      Item("Macbook", 2000),
+      Item("Bicycle", 500),
+      Item("Subaru", 10000)
+    ).map(item => item.name -> ItemData(item, 0)).toMap
+
+    val users = MemoryUserStore.users.values.map(_.uuid).map(id => id -> UserData(id)).toMap
+    val userIds = users.keys.toList
+
+    val currentGames = Map(
+      "Macbook" -> Game(items("Macbook").item).upsertBid(userIds.head, 534),
+      "Bicycle" -> Game(items("Bicycle").item).upsertBid(userIds.head, 123).upsertBid(userIds(1), 222).upsertBid(userIds(2), 320)
+    )
 
     BidChampData(
-      items = items.map(item => item.name -> ItemData(item, 0)).toMap,
-      users = MemoryUserStore.users.values.map(_.uuid).map(id => id -> UserData(id)).toMap
+      items = items,
+      users = users,
+      currentGames = currentGames
     )
   }
 
@@ -241,6 +254,7 @@ case class UserItem(
   gameEnds: Option[Long],
   chanceOfWinning: Option[Double],
   moneySpent: Option[Int],
+  percentageAchieved: Double,
   item: Item
 )
 
@@ -251,7 +265,7 @@ object UserItem {
     val bid = game.bids.get(user.id)
     val chances = game.winningChancesForUser(user.id)
 
-    UserItem(game.status.stringMessage, game.startTime, game.endTime, chances, bid, game.item)
+    UserItem(game.status.stringMessage, game.startTime, game.endTime, chances, bid, game.percentageAchieved, game.item)
   }
 
   def fromItem(user: UserData, item: Item): UserItem =
