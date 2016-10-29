@@ -1,36 +1,37 @@
 package model
 
 import services.DrawWinners
-
 import java.util.UUID
 
-case class Game(id: Long, item : Item, bids : Map[User, Bid], status : Status) { self =>
-  val moneyPooled: Int = bids.map(_._2.amount).sum
+import play.api.libs.json._
+
+case class Game(id: Long, item : Item, bids : Map[UUID, Int], status : Status) { self =>
+  val moneyPooled: Int = bids.values.sum
   val itemsToWin: Int = moneyPooled / item.price
   val percentageAchieved: Double = moneyPooled.toDouble / item.price
-  val exceedAmount: Int = bids.values.map(_.amount).sum % item.price
+  val exceedAmount: Int = bids.values.sum % item.price
 
-  def winningChances: Map[User, Double] =
-    bids.mapValues { bid =>
+  def winningChancesForUser(userId: UUID): Option[Double] =
+    bids.get(userId).map { bid =>
       val divisor = itemsToWin match {
         case 0 => item.price // not enough money pooled yet
         case 1 => moneyPooled // enough money pooled for one item
         case _ => item.price * 2 - 1 // minimum chances
       }
-      bid.amount.toDouble / divisor
+      bid.toDouble / divisor
     }
 
   def updateStatus() : Game = status match {
     case NotStarted if itemsToWin > 1 =>
       self.copy(status = Running(System.currentTimeMillis()))
     case s: Running if s.endTime < System.currentTimeMillis() =>
-      self.copy(status = Finished(DrawWinners(self)))
+      self.copy(status = Finished(s.startTime, s.endTime, DrawWinners(self)))
     case _ =>
       self
   }
 
-  def upsertBid(user : User, additionalAmount : Int) : Game = {
-    val updatedBid = bids.get(user).map(_.increase(additionalAmount)).getOrElse(Bid(additionalAmount))
+  def upsertBid(user : UUID, additionalAmount : Int) : Game = {
+    val updatedBid = bids.get(user).map(_ + additionalAmount).getOrElse(additionalAmount)
     self.copy(bids = self.bids + (user -> updatedBid))
   }
 
@@ -40,23 +41,46 @@ case class Game(id: Long, item : Item, bids : Map[User, Bid], status : Status) {
   }
 
   def isActive: Boolean = !isPassive
+
+  def startTime: Option[Long] = status match {
+    case Running(startTime, _) => Some(startTime)
+    case Finished(startTime, _, _) => Some(startTime)
+    case _ => None
+  }
+
+  def endTime: Option[Long] = status match {
+    case Running(_, endTime) => Some(endTime)
+    case Finished(_, endTime, _) => Some(endTime)
+    case _ => None
+  }
 }
 
 object Game {
   def newInstance(id: Long, item : Item) = Game(id, item, Map(), NotStarted)
 }
 
-case class User(name : String, uuid: UUID = UUID.randomUUID())
-
-case class Bid(amount : Int) {
-  def increase(a: Int): Bid = Bid(amount + a)
-}
 case class Item(name : String, price : Int)
 
-sealed trait Status
-case object NotStarted extends Status
-case class Running(startTime: Long, endTime: Long) extends Status
+object Item {
+  implicit val itemJsonFormat: OFormat[Item] = Json.format[Item]
+}
+
+sealed trait Status {
+  def stringMessage: String
+}
+
+case object NotStarted extends Status {
+  override def stringMessage: String = "Waiting for bids..."
+}
+
+case class Running(startTime: Long, endTime: Long) extends Status {
+  override def stringMessage: String = "Game is about to close!"
+}
+
 object Running {
   def apply(startTime: Long): Running = Running(startTime, startTime + (10 * 60 * 1000).toLong) // +10 minutes
 }
-case class Finished(winner : List[User]) extends Status
+
+case class Finished(startTime: Long, endTime: Long, winners : List[UUID]) extends Status {
+  override def stringMessage: String = "Game finished!"
+}

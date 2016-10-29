@@ -167,9 +167,9 @@ trait Authorization extends Results {
 
   def readSessionTokenOrElse(ifEmpty: RequestHeader => Result) =  new ActionBuilder[SessionTokenRequest] with ActionRefiner[Request, SessionTokenRequest] {
     def refine[A](request: Request[A]): Future[Either[Result, SessionTokenRequest[A]]] = Future.successful(
-      request.cookies
+      request.session
         .get(SessionTokenCookieName)
-        .map(sessionTokenCookie => new SessionTokenRequest(sessionTokenCookie.value, request))
+        .map(sessionTokenCookie => new SessionTokenRequest(sessionTokenCookie, request))
         .toRight(ifEmpty(request))
     )
   }
@@ -185,6 +185,9 @@ trait Authorization extends Results {
 
     }
 
-  def withUser = validateUserSessionOrElse(_ => Unauthorized("Not logged In"))
+  def withUser = validateUserSessionOrElse { _ =>
+    println("redirect to signin")
+    Redirect(routes.GithubAuthController.signin())
+  }
 
 }

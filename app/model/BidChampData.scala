@@ -15,6 +15,21 @@ case class BidChampData(
     if (games.isEmpty) 0L
     else games.keySet.max + 1
 
+  def userStates: List[UserState] =
+    users.values.toList.map(userDataToState)
+
+  def userStateForId(userId: UUID): Option[UserState] =
+    users.get(userId).map(userDataToState)
+
+  private def userDataToState(data: UserData): UserState = {
+    val userGames = for {
+      game <- games.values
+      if game.bids.contains(data.id)
+    } yield UserGameState.fromUserData(data, game)
+
+    UserState(data.id, userGames.toList)
+  }
+
   def eval(command: InternalCommand): Result = command match {
     case Refresh =>
       val updates = games.mapValues { game =>
@@ -35,14 +50,14 @@ case class BidChampData(
 
       Result(updatedState, events)
 
-    case AddUser(username) =>
-      if (users.values.exists(_.user.name == username))
-        justEvents(Event(Set.empty, EventContent(s"User '$username' already exists.", None)))
+    case AddUser(userId) =>
+      if (users.values.exists(_.id == userId))
+        justEvents(Event(Set.empty, EventContent(s"User '$userId' already exists.", None)))
       else {
-        val userData = UserData(User(username))
+        val userData = UserData(userId)
         Result(
           state = copy(users = users + (userData.id -> userData)),
-          events = List(Event(Set.empty, EventContent(s"User '$username' created", None)))
+          events = List(Event(Set.empty, EventContent(s"User '$userId' created", None)))
         )
       }
 
@@ -50,21 +65,21 @@ case class BidChampData(
       users.get(userId) match {
         case None => justEvents(Event(Set.empty, EventContent(s"Invalid user.", None)))
         case Some(userData) =>
-          evalWithUser(userData.user, c)
+          evalWithUser(userData.id, c)
       }
   }
 
   def updateWin(game: Game): BidChampData =
     game.status match {
-      case Finished(winners) if games.contains(game.id) =>
-        val winnerIds = winners.map(_.uuid).toSet
+      case finished: Finished if games.contains(game.id) =>
+        val winnerSet = finished.winners.toSet
 
         val updatedUsers = users.mapValues { userData =>
           val itemAdded =
-            if (winnerIds(userData.user.uuid)) userData.addItem(game.item)
+            if (winnerSet(userData.id)) userData.addItem(game.item)
             else userData
-          game.bids.get(userData.user)
-            .map(bid => itemAdded.increaseSpending(bid.amount))
+          game.bids.get(userData.id)
+            .map(bid => itemAdded.increaseSpending(bid))
             .getOrElse(itemAdded)
         }
 
@@ -81,16 +96,16 @@ case class BidChampData(
     items = items ++ itemData.map(d => d.item.name -> d)
   )
 
-  private def evalWithUser(user: User, command: Command): Result = command match {
+  private def evalWithUser(userId: UUID, command: Command): Result = command match {
     case bid: StartBid =>
       items.get(bid.item) match {
         case None =>
           justEvents(Event(Set.empty, EventContent(s"Item '${bid.item}' doesn't exist.", None)))
         case Some(itemData) =>
-          val game = Game.newInstance(nextGameId, itemData.item).upsertBid(user, bid.amount)
+          val game = Game.newInstance(nextGameId, itemData.item).upsertBid(userId, bid.amount)
           Result(
             state = updateGame(game),
-            events = List(Event(Set(user.uuid), EventContent(s"Created a new bid for item '${itemData.item.name}'.", None)))
+            events = List(Event(Set(userId), EventContent(s"Created a new bid for item '${itemData.item.name}'.", None)))
           )
       }
 
@@ -99,10 +114,10 @@ case class BidChampData(
         case None => justEvents(Event(Set.empty, EventContent(s"No game #${bid.game} found.", None)))
         case Some(game) if game.isActive =>
           Result(
-            state = updateGame(game.upsertBid(user, bid.amount)),
+            state = updateGame(game.upsertBid(userId, bid.amount)),
             events = List(Event(
-              targets = game.bids.keySet.map(_.uuid) - user.uuid,
-              content = EventContent(s"User '${user.name}' bid ${bid.amount} for item ${game.item.toString}.", None)
+              targets = game.bids.keySet - userId,
+              content = EventContent(s"New bid of ${bid.amount} has been added for item ${game.item.toString}.", None)
             ))
           )
         case Some(game) =>
@@ -113,7 +128,7 @@ case class BidChampData(
   private def gameUpdateToEvents(oldGame: Game, updatedGame: Game): List[Event] = {
     val itemName = updatedGame.item.name
     val gameId = updatedGame.id
-    val bidders = updatedGame.bids.keySet.map(_.uuid)
+    val bidders = updatedGame.bids.keySet
 
     (oldGame.status, updatedGame.status) match {
       case (NotStarted, _: Running) =>
@@ -122,9 +137,9 @@ case class BidChampData(
           content = EventContent(s"The bid for '$itemName' has started! ~10 minutes until winners are drawn!", Some(gameId))
         ))
 
-      case (_: Running, Finished(winners)) =>
-        val winnerIds = winners.map(_.uuid).toSet
-        val losers = bidders -- winnerIds
+      case (_: Running, finished: Finished) =>
+        val winnerSet = finished.winners.toSet
+        val losers = bidders -- winnerSet
         val finishedMsg = s"The draw for '$itemName' has finished!"
         List(
           Event(
@@ -132,7 +147,7 @@ case class BidChampData(
             content = EventContent(s"$finishedMsg Better luck next time!", Some(gameId))
           ),
           Event(
-            targets = winnerIds,
+            targets = winnerSet,
             content = EventContent(s"$finishedMsg You have won!", Some(gameId))
           )
         )
@@ -170,7 +185,7 @@ object BidChampData {
 
   object Refresh extends InternalCommand
 
-  case class AddUser(user: String) extends InternalCommand
+  case class AddUser(userId: UUID) extends InternalCommand
 
   case class UserCommand(
     userId: UUID,
@@ -203,14 +218,49 @@ object BidChampData {
   }
 }
 
+case class UserState(
+  user: UUID,
+  games: List[UserGameState]
+)
+
+object UserState {
+  implicit val userStateJsonFormat: OFormat[UserState] = Json.format[UserState]
+}
+
+case class UserGameState(
+  gameId: Long,
+  gameStatus: String,
+  gameStarted: Option[Long],
+  gameEnds: Option[Long],
+  chanceOfWinning: Option[Double],
+  moneySpent: Option[Int]
+)
+
+object UserGameState {
+  implicit val userGameStateJsonFormat: OFormat[UserGameState] = Json.format[UserGameState]
+
+  def fromUserData(user: UserData, game: Game): UserGameState = {
+    val bid = game.bids.get(user.id)
+    val chances = game.winningChancesForUser(user.id)
+
+    UserGameState(game.id, game.status.stringMessage, game.startTime, game.endTime, chances, bid)
+  }
+}
+
 case class ItemData(item: Item, purchased: Int) {
   def increasePurchases(count: Int): ItemData = copy(purchased = purchased + count)
 }
 
-case class UserData(user: User, spent: Int = 0, itemsWon: List[Item] = Nil) {
-  def id = user.uuid
+object ItemData {
+  implicit val itemDataJsonFormat: OFormat[ItemData] = Json.format[ItemData]
+}
 
+case class UserData(id: UUID, spent: Int = 0, itemsWon: List[Item] = Nil) {
   def addItem(item: Item): UserData = copy(itemsWon = item :: itemsWon)
 
   def increaseSpending(amount: Int) = copy(spent = spent + amount)
+}
+
+object UserData {
+  implicit val userDataJsonFormat: OFormat[UserData] = Json.format[UserData]
 }
