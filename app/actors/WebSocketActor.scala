@@ -3,7 +3,7 @@ package actors
 import java.util.UUID
 
 import akka.actor._
-import model.BidChampData
+import model.{BidChampData, UserState}
 import model.BidChampData.Command
 import play.api.libs.json._
 
@@ -33,6 +33,10 @@ class WebSocketActor(userId: UUID, out: ActorRef, gameActor : ActorRef) extends 
     case event: BidChampData.EventContent =>
       log.info("Received event: {}", event)
       out ! Json.toJson(event)
+
+    case userState: UserState =>
+      log.info("Received user state: {}", userState)
+      out ! Json.toJson(userState)
   }
 
   override def postStop() = {
