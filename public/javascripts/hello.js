@@ -9,10 +9,9 @@ sock.onopen = function() {
 sock.onmessage = function(e) {
   console.log('websocket received', e.data);
   var json = JSON.parse(e.data);
-  if (typeof json.items != 'undefined'){
+  if (json.items){
     updateCard(json.items[1]);
-  }
-  if (json.eventType === 'NOTIFICATION'){
+  } else if (json.eventType === 'NOTIFICATION'){
     $.notify(json.body, "success");
   }
 };
