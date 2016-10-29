@@ -5,6 +5,6 @@ class Module extends AbstractModule {
 
   override def configure() = {
     bind(classOf[BidChampCore]).to(classOf[AtomicBidChampCore])
-    bind(classOf[UserStore]).to(classOf[MemoryUserStore])
+    bind(classOf[UserStore]).to(classOf[MemoryUserStore]).asEagerSingleton()
   }
 }

@@ -7,11 +7,11 @@ import play.api.libs.json.Json
 
 case class UserAccount(
                         uuid: UUID,
-                        email: Option[String],
+                        email: String,
                         name: Option[String],
                         phoneNumber: Option[String],
                         created: DateTime,
-                        passwordInfo: Option[String],
+                        passwordInfo: String,
                         failureAttempt: Int
                       )
 

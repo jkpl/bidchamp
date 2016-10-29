@@ -7,17 +7,14 @@ GET     /                           controllers.HomeController.index
 GET     /state                      controllers.BidChampController.state
 
 POST /api/user/account              controllers.AuthController.createUserAccount()
-POST /api/user/renew                controllers.AuthController.renew()
-POST /api/user/verify               controllers.AuthController.verify()
 
 POST /api/user/password/request     controllers.PasswordController.newPasswordResetRequest
 POST /api/user/password/verify      controllers.PasswordController.newPasswordResetVerify
 POST /api/user/password/reset       controllers.PasswordController.newPasswordReset
 
 POST /api/user/login                controllers.AuthController.login()
-POST /api/user/login/cookie         controllers.AuthController.authenticateUserWithCookie()
 POST /api/user/logout               controllers.AuthController.logout()
-GET  /api/user/:id                  controllers.AuthController.getUser(id)
+GET  /api/user                      controllers.AuthController.getUser()
 
 
 
