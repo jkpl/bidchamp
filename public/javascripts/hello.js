@@ -48,7 +48,7 @@ var bidChampState = (function() {
             : "-"
     );
 
-    $("#item-increase-bid")
+    $("#item-bid")
         .off('click')
         .on('click', function() {
             console.log("Send bid!");
