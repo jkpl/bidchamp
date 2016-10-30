@@ -1,12 +1,5 @@
 var sock = new WebSocket('ws://' + location.host + '/socket');
 
-var redrawTimeLeft = function(element, target) {
-  return setInterval(function() {
-    var timeRemaining = target - new Date();
-    element.text(msToTime(timeRemaining));
-  }, 500);
-};
-
 function msToTime(duration) {
   if (!Number.isInteger(duration) || duration < 1000) return "00:00:00";
 
@@ -21,91 +14,88 @@ function msToTime(duration) {
   return hours + ":" + minutes + ":" + seconds ;
 }
 
-var bidChampState = (function() {
+var createBidChampState = function() {
   var obj = {
-    items: []
+    items: ko.observable()
   };
-
-  function updateCard(item) {
-    var d = new Date();
-    $("#item-description").text(
-        item.item.name + " (£" + item.item.price + ")"
-    );
-    $("#item-achieved").text(
-        (item.percentageAchieved * 100).toFixed(2) + "%"
-    );
-    $("#item-image").text(item.image);
-    $("#item-odds").text(
-        item.chanceOfWinning
-            ? (item.chanceOfWinning * 100).toFixed(2) + "%"
-            : "-"
-    );
-    if (item.gameEnds) {
-      item.timerId = redrawTimeLeft($("#item-time-left"), new Date(item.gameEnds));
-    } else {
-      $("#item-time-left").text('-')
-    }
-    $("#item-bid-amount").text(
-        item.moneySpent
-            ? "£" + item.moneySpent
-            : "-"
-    );
-
-    $("#item-bid")
-        .off('click')
-        .on('click', function() {
-            console.log("Send bid!");
-            sock.send(JSON.stringify({
-              command: "addToBid",
-              payload: {
-                item: "Macbook",
-                amount: 10
-              }
-            }));
-        });
-  }
 
   obj.updateUserId = function(userId) {
     obj.userId = userId;
   };
 
   obj.updateItems = function(items) {
-    obj.items.forEach(function(item) {
-      if (item.timerId) {
-        clearInterval(item.timerId);
-      }
+    var nextItems = items.map(function(item) {
+      return {
+        description: item.item.name + " (£" + item.item.price + ")",
+        achieved: (item.percentageAchieved * 100).toFixed(2) + "%",
+        imagePath: 'assets/images/apple-macbook.jpg',
+        endTime: item.gameEnds,
+        odds: item.chanceOfWinning
+            ? (item.chanceOfWinning * 100).toFixed(2) + "%"
+            : "-",
+        timeRemaining: ko.observable(msToTime(new Date(item.gameEnds) - new Date())),
+        bid: item.moneySpent
+            ? "£" + item.moneySpent
+            : "-",
+        addBid: function() {
+          console.log("Send bid!");
+          sock.send(JSON.stringify({
+            command: "addToBid",
+            payload: {
+              item: item.item.name,
+              amount: 10
+            }
+          }));
+        }
+      };
     });
-    obj.items = items;
 
-    obj.items.forEach(function(item, index) {
-      if (item.item.name === 'Macbook') {
-        updateCard(item)
-      }
-    });
+    obj.items(nextItems);
   };
 
+  setInterval(function() {
+    var items = obj.items();
+    if (items) {
+      items.forEach(function(item) {
+        if (item.endTime) {
+          var timerRemaining = new Date(item.endTime) - new Date();
+          item.timeRemaining(msToTime(timerRemaining));
+        }
+      });
+    }
+  }, 500);
+
   return obj;
-}());
-
-sock.onopen = function() {
-  console.log('websocket opened');
 };
 
-sock.onmessage = function(e) {
-  console.log('websocket received', e.data);
-  var json = JSON.parse(e.data);
+$(document).ready(function() {
+  console.log('Document loaded!');
 
-  if (json.user) {
-    bidChampState.updateUserId(json.user);
-  }
+  var bidChampState = createBidChampState();
 
-  if (json.items){
-    bidChampState.updateItems(json.items);
-  } else if (json.eventType === 'NOTIFICATION'){
-    $.notify(json.body, "success", {autoHideDelay: 10000, });
-  }
-};
+  ko.applyBindings(bidChampState, document.getElementById('app-root'));
 
-sock.onclose = function() {
-  console.log('websocket closed');
-};
+  sock.onopen = function() {
+    console.log('websocket opened');
+  };
+
+  sock.onmessage = function(e) {
+    console.log('websocket received', e.data);
+    var json = JSON.parse(e.data);
+
+    if (json.user) {
+      bidChampState.updateUserId(json.user);
+    }
+
+    if (json.items){
+      bidChampState.updateItems(json.items);
+    } else if (json.body) {
+      $.notify(json.body, "success", {autoHideDelay: 10000});
+    }
+  };
+
+  sock.onclose = function() {
+    console.log('websocket closed');
+  };
+
+});

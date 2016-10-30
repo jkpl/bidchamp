@@ -24,28 +24,29 @@
  }
  </style>
 
-    <div class="page-content">
-        <div class="mdl-grid">
-            <div class="mdl-layout-spacer"></div>
+    <div class="page-content" id="app-root">
+        <div class="mdl-layout-spacer"></div>
+        <div class="mdl-grid" data-bind="foreach: items">
             <div class="mdl-cell mdl-cell--4-col">
-                <img src="assets/images/apple-macbook.jpg" alt="Macbook" style="max-width: 100%; max-height: 100%;"/>
+                <img alt="-" style="max-width: 100%; max-height: 100%;"
+                     data-bind="attr: { src: imagePath, alt: description }"/>
             </div>
             <div class="mdl-cell mdl-cell--6-col">
-                <h3 id="item-description" style="margin-top: 0px; margin-bottom: 10px">-</h3>
+                <h3 style="margin-top: 0px; margin-bottom: 10px" data-bind="text: description">-</h3>
                 <div class="mdl-grid">
                     <ul class="mdl-list mdl-cell mdl-cell--6-col">
                         <li class="mdl-list__item mdl-list__item--two-line">
                             <span class="mdl-list__item-primary-content">
                                 <i class="material-icons mdl-list__item-icon">trending_up</i>
                                 <span>Achieved</span>
-                                <span id="item-achieved" class="mdl-list__item-sub-title">-</span>
+                                <span class="mdl-list__item-sub-title" data-bind="text: achieved">-</span>
                             </span>
                         </li>
                         <li class="mdl-list__item mdl-list__item--two-line">
                             <span class="mdl-list__item-primary-content">
                                 <i class="material-icons mdl-list__item-icon">exposure</i>
                                 <span>Odds</span>
-                                <span id="item-odds" class="mdl-list__item-sub-title"></span>
+                                <span class="mdl-list__item-sub-title" data-bind="text: odds"></span>
                             </span>
                         </li>
                     </ul>
@@ -54,20 +55,20 @@
                             <span class="mdl-list__item-primary-content">
                                 <i class="material-icons mdl-list__item-icon">timelapse</i>
                                 <span>Time left</span>
-                                <span id="item-time-left" class="mdl-list__item-sub-title"></span>
+                                <span class="mdl-list__item-sub-title" data-bind="text: timeRemaining"></span>
                             </span>
                         </li>
                         <li class="mdl-list__item mdl-list__item--two-line">
                             <span class="mdl-list__item-primary-content">
                                 <i class="material-icons mdl-list__item-icon">account_balance_wallet</i>
                                 <span>Current bid</span>
-                                <span id="item-bid-amount" class="mdl-list__item-sub-title"></span>
+                                <span class="mdl-list__item-sub-title" data-bind="text: bid"></span>
                             </span>
                         </li>
 
                     </ul>
                 </div>
-                <button id="item-bid" class="mdl-button mdl-js-button mdl-button--raised mdl-button--accent">
+                <button class="mdl-button mdl-js-button mdl-button--raised mdl-button--accent" data-bind="click: addBid">
                     Raise bid by £10!
                 </button>
                 <button class="mdl-button mdl-js-button mdl-button--raised mdl-button--accent">
@@ -75,7 +76,7 @@
                     Share!
                 </button>
             </div>
-            <div class="mdl-layout-spacer"></div>
         </div>
+        <div class="mdl-layout-spacer"></div>
     </div>
 }
