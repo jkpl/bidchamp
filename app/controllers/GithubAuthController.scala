@@ -20,8 +20,8 @@ class GithubAuthController @Inject()(userStore : UserStore, configuration: Confi
   val SESSION_TOKEN_KEY = "session-token"
 
   val GITHUB = new OAuth2[GithubUser](OAuth2Settings(
-    "f1b0ed53d3a8a45a046b",
-    "a435dd914279dc5b6e21409288e7ab38de89d896",
+    configuration.getString("clientId").get,
+    configuration.getString("clientSecret").get,
     "https://github.com/login/oauth/authorize",
     "https://github.com/login/oauth/access_token",
     "https://api.github.com/user",
@@ -30,7 +30,7 @@ class GithubAuthController @Inject()(userStore : UserStore, configuration: Confi
     def user(body: String): GithubUser = { println(body); Json.parse(body).validate[GithubUser](githubUserReads).get}
   }
 
-  println(configuration.getString("callbackHost").get)
+  println("Configuration is" + configuration.getString("callbackHost").get)
   case class GithubUser(
                          login: String,
                          email: String,
