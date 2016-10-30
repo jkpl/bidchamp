@@ -47,7 +47,7 @@ class AuthController @Inject() (val userStore: UserStore)
 
   def loginPost() = Action{ implicit request =>
     LoginForm.bindFromRequest.fold(
-      _ =>  BadRequest(views.html.login(showFailureAlert = true)),
+      _ =>  BadRequest(views.html.login()),
       loginCredentials =>
         userStore.loginUser(loginCredentials.username, loginCredentials.password).map { account =>
           Ok(views.html.index(account))
@@ -183,7 +183,7 @@ trait Authorization extends Results {
 
   def withUser = validateUserSessionOrElse { _ =>
     println("redirect to signin")
-    Redirect(routes.GithubAuthController.signin())
+    Redirect(routes.AuthController.login())
   }
 
 }
