@@ -25,6 +25,8 @@ case class JsExtractor[T](implicit reads : Reads[T]){
 class WebSocketActor(userId: UUID, out: ActorRef, gameActor : ActorRef) extends Actor with ActorLogging {
   val commandExtractor = JsExtractor[Command]()
 
+  println(userId)
+
   def receive = {
     case commandExtractor(command) =>
       log.info("Received command: {}", command)

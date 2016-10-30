@@ -29,7 +29,6 @@ case class BidChampData(
       (itemId, item) <- items
       if !currentGames.contains(itemId)
     } yield UserItem.fromItem(data, item.item)
-
     UserState(data.id, data.itemsWon, charity, userGames.toList ++ userItems.toList)
   }
 
