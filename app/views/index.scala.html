@@ -22,265 +22,60 @@
      background-position: center;
      margin-left: 20px;
  }
- .demo-card-image.mdl-card {
-  width: 256px;
-  height: 256px;
- }
- .demo-card-image > .mdl-card__actions {
-  height: 52px;
-  padding: 16px;
-  background: rgba(0, 0, 0, 0.2);
- }
- .demo-card-image__filename {
-  color: #fff;
-  font-size: 14px;
-  font-weight: 500;
- }
-
- .demo-card-wide.mdl-card {
-  width: 650px;
- }
- .demo-card-wide > .mdl-card__title {
-  color: #fff;
-  height: 176px;
-  background: url('assets/images/apple-macbook.jpg') center / cover;
- }
- #item-name {
-     text-shadow: 2px 2px 8px #000000;
-     font-weight: bold;
-     padding-left: 8px;
-     padding-right: 8px;
- }
- #item-price {
-     text-shadow: 2px 2px 8px #000000;
-     position: absolute;
-     right: 10px;
-     padding-left: 8px;
-     padding-right: 8px;
- }
- .demo-card-wide > .mdl-card__menu {
-  color: #fff;
- }
-  .card-event.mdl-card {
-   width: 100px;
-   height: 100px;
-   min-height: 100px;
-   background: #3E4EB8;
-  }
- .card-amount > .mdl-card__actions {
-   border-color: rgba(255, 255, 255, 0.2);
-  }
- .card-amount > .mdl-card__title {
-  align-items: flex-start;
- }
- .card-amount > .mdl-card__title > h4 {
-  margin-top: 0;
- }
-
- .card-probability > .mdl-card__actions {
-  border-color: rgba(255, 255, 255, 0.2);
- }
- .card-probability > .mdl-card__title {
-  align-items: flex-start;
- }
- .card-probability > .mdl-card__title > h4 {
-  margin-top: 0;
- }
-
- .card-time > .mdl-card__actions {
-  border-color: rgba(255, 255, 255, 0.2);
- }
- .card-time > .mdl-card__title {
-  align-items: flex-start;
- }
- .card-time > .mdl-card__title > h4 {
-  margin-top: 0;
- }
-
- .card-time.mdl-card {
-  width: 125px;
-  height: 100px;
-  min-height: 100px;
-  background: #3E4EB8;
- }
-
- .card-probability.mdl-card {
-  width: 110px;
-  height: 100px;
-  min-height: 100px;
-  background: #990cb8;
- }
-
- .card-amount.mdl-card {
-  width: 100px;
-  height: 100px;
-  min-height: 100px;
-  background: #30b817;
- }
-
-
- .card-amount > .mdl-card__actions {
-  border-color: rgba(255, 255, 255, 0.2);
- }
-
- .card-probability > .mdl-card__actions {
-  border-color: rgba(255, 255, 255, 0.2);
- }
-
- .card-time > .mdl-card__actions {
-  border-color: rgba(255, 255, 255, 0.2);
- }
-
- .card-time > .mdl-card__title {
-  align-items: flex-start;
- }
-
- .card-probability > .mdl-card__title {
-  align-items: flex-start;
- }
-
- .card-amount > .mdl-card__title {
-  align-items: flex-start;
- }
-
- .card-amount > .mdl-card__title > h4 {
-  margin-top: 0;
- }
-
- .card-probability > .mdl-card__title > h4 {
-  margin-top: 0;
- }
-
- .card-time > .mdl-card__title > h4 {
-  margin-top: 0;
- }
-
- .card-time > .mdl-card__actions {
-  display: flex;
-  box-sizing:border-box;
-  align-items: center;
- }
-
- .card-probability > .mdl-card__actions {
-  display: flex;
-  box-sizing:border-box;
-  align-items: center;
- }
-
- .card-amount > .mdl-card__actions {
-  display: flex;
-  box-sizing:border-box;
-  align-items: center;
- }
-
- .card-amount > .mdl-card__actions > .material-icons {
-  padding-right: 10px;
- }
-
- .card-probability > .mdl-card__actions > .material-icons {
-  padding-right: 10px;
- }
-
- .card-time > .mdl-card__actions > .material-icons {
-  padding-right: 10px;
- }
-
-
- .card-amount > .mdl-card__title,
- .card-amount > .mdl-card__actions,
- .card-amount > .mdl-card__actions > .mdl-button {
-  color: #fff;
- }
-
- .card-probability > .mdl-card__title,
- .card-probability > .mdl-card__actions,
- .card-probability > .mdl-card__actions > .mdl-button {
-  color: #fff;
- }
-
- .card-time > .mdl-card__title,
- .card-time > .mdl-card__actions,
- .card-time > .mdl-card__actions > .mdl-button {
-  color: #fff;
- }
-
  </style>
 
     <div class="page-content">
         <div class="mdl-grid">
-            <div class="mdl-cell mdl-cell--1-col">
+            <div class="mdl-layout-spacer"></div>
+            <div class="mdl-cell mdl-cell--4-col">
+                <img src="assets/images/apple-macbook.jpg" alt="Macbook" style="max-width: 100%; max-height: 100%;"/>
             </div>
-            <div class="mdl-cell mdl-cell--10-col">
+            <div class="mdl-cell mdl-cell--6-col">
+                <h3 id="item-description" style="margin-top: 0px; margin-bottom: 10px">-</h3>
+                <div class="mdl-grid">
+                    <ul class="mdl-list mdl-cell mdl-cell--6-col">
+                        <li class="mdl-list__item mdl-list__item--two-line">
+                            <span class="mdl-list__item-primary-content">
+                                <i class="material-icons mdl-list__item-icon">trending_up</i>
+                                <span>Achieved</span>
+                                <span id="item-achieved" class="mdl-list__item-sub-title">-</span>
+                            </span>
+                        </li>
+                        <li class="mdl-list__item mdl-list__item--two-line">
+                            <span class="mdl-list__item-primary-content">
+                                <i class="material-icons mdl-list__item-icon">exposure</i>
+                                <span>Odds</span>
+                                <span id="item-odds" class="mdl-list__item-sub-title"></span>
+                            </span>
+                        </li>
+                    </ul>
+                    <ul class="mdl-list mdl-cell mdl-cell--6-col">
+                        <li class="mdl-list__item mdl-list__item--two-line">
+                            <span class="mdl-list__item-primary-content">
+                                <i class="material-icons mdl-list__item-icon">timelapse</i>
+                                <span>Time left</span>
+                                <span id="item-time-left" class="mdl-list__item-sub-title"></span>
+                            </span>
+                        </li>
+                        <li class="mdl-list__item mdl-list__item--two-line">
+                            <span class="mdl-list__item-primary-content">
+                                <i class="material-icons mdl-list__item-icon">account_balance_wallet</i>
+                                <span>Current bid</span>
+                                <span id="item-bid-amount" class="mdl-list__item-sub-title"></span>
+                            </span>
+                        </li>
 
-                <div class="demo-card-wide mdl-card mdl-shadow--2dp">
-                    <div class="mdl-card__title">
-                        <h2 class="mdl-card__title-text" id="item-name"></h2>
-                        <h2 class="mdl-card__title-text" id="item-price"></h2>
-                    </div>
-                    <div class="mdl-card__supporting-text" id="item-description">
-
-                    </div>
+                    </ul>
                 </div>
-            </div>
-            <div class="mdl-cell mdl-cell--1-col">
-            </div>
-        </div>
-
-        <div class="mdl-grid">
-            <div class="mdl-cell mdl-cell--2-col">
-            </div>
-            <div class="mdl-cell mdl-cell--2-col">
-                <div class="card-probability mdl-card mdl-shadow--2dp">
-                    <div class="mdl-card__title mdl-card--expand">
-                        <h4 id="item-odds">
-                            11:00
-                        </h4>
-                    </div>
-                    <div class="mdl-card__actions mdl-card--border">
-                        <a class="mdl-button mdl-button--colored mdl-js-button mdl-js-ripple-effect">
-                            Odds
-                        </a>
-                        <div class="mdl-layout-spacer"></div>
-                    </div>
-                </div>
-            </div>
-            <div class="mdl-cell mdl-cell--2-col">
-                <div class="card-time mdl-card mdl-shadow--2dp">
-                    <div class="mdl-card__title mdl-card--expand">
-                        <h4 id="item-time-left">
-                            11:00
-                        </h4>
-                    </div>
-                    <div class="mdl-card__actions mdl-card--border">
-                        <a class="mdl-button mdl-button--colored mdl-js-button mdl-js-ripple-effect">
-                            Time
-                        </a>
-                        <div class="mdl-layout-spacer"></div>
-                    </div>
-                </div>
-            </div>
-            <div class="mdl-cell mdl-cell--2-col">
-                <div class="card-amount mdl-card mdl-shadow--2dp">
-                    <div class="mdl-card__title mdl-card--expand">
-                        <h4 id="item-bid-amount">
-                            10 £
-                        </h4>
-                    </div>
-                    <div class="mdl-card__actions mdl-card--border">
-                        <a class="mdl-button mdl-button--colored mdl-js-button mdl-js-ripple-effect">
-                            Bet
-                        </a>
-                        <div class="mdl-layout-spacer"></div>
-                    </div>
-                </div>
-            </div>
-            <div class="mdl-cell mdl-cell--2-col">
-                <button id="item-bid" class="mdl-button mdl-js-button mdl-button--fab mdl-js-ripple-effect mdl-button--colored">
-                    Bid
+                <button id="item-bid" class="mdl-button mdl-js-button mdl-button--raised mdl-button--accent">
+                    Raise bid by £10!
+                </button>
+                <button class="mdl-button mdl-js-button mdl-button--raised mdl-button--accent">
+                    <i class="material-icons">share</i>
+                    Share!
                 </button>
             </div>
-            <div class="mdl-cell mdl-cell--2-col">
-            </div>
+            <div class="mdl-layout-spacer"></div>
         </div>
     </div>
 }
