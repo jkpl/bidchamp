@@ -35,7 +35,7 @@ var createBidChampState = function() {
       return {
         description: item.item.name + " (£" + item.item.price + ")",
         achieved: (item.percentageAchieved * 100).toFixed(2) + "%",
-        imagePath: 'assets/images/apple-macbook.jpg',
+        imagePath: item.item.imagePath,
         endTime: item.gameEnds,
         odds: item.chanceOfWinning
             ? (item.chanceOfWinning * 100).toFixed(2) + "%"
