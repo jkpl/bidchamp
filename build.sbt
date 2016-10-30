@@ -1,3 +1,5 @@
+
+
 name := """bidchamp"""
 
 version := "1.0-SNAPSHOT"
@@ -20,3 +22,4 @@ libraryDependencies ++= Seq(
 ) ++ miscDependencies
 
 
+herokuAppName in Compile := "fierce-tor-96958"
