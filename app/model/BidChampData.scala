@@ -30,7 +30,7 @@ case class BidChampData(
       if !currentGames.contains(itemId)
     } yield UserItem.fromItem(data, item.item)
 
-    UserState(data.id, userGames.toList ++ userItems.toList)
+    UserState(data.id, data.itemsWon, charity, userGames.toList ++ userItems.toList)
   }
 
   def eval(command: InternalCommand): Result = command match {
@@ -253,6 +253,8 @@ object BidChampData {
 
 case class UserState(
   user: UUID,
+  ownedItems: List[Item],
+  charity: Long,
   items: List[UserItem]
 )
 
