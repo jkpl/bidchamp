@@ -108,11 +108,16 @@ case class BidChampData(
             case None =>
               justEvents(Event(Set.empty, EventContent(s"Item '${bid.item}' doesn't exist.", None)))
             case Some(itemData) =>
-              val game = Game(itemData.item).upsertBid(userId, bid.amount)
-              Result(
-                state = updateGame(game),
-                events = List(Event(Set(userId), EventContent(s"Created a new bid for item '${itemData.item.name}'.", Some(itemData.item.name))))
-              )
+              val game = Game(itemData.item)
+              val currentAmount = game.bids.getOrElse(userId, 0)
+              if ((currentAmount + bid.amount) < itemData.item.price % 2) {
+                Result(
+                  state = updateGame(game.upsertBid(userId, bid.amount)),
+                  events = List(Event(Set(userId), EventContent(s"Created a new bid for item '${itemData.item.name}'.", Some(itemData.item.name))))
+                )
+              } else {
+                Result(updateGame(game), List(Event(Set(userId), EventContent("Can not bet more than 50% of price of item", Some(itemData.item.name)))))
+              }
           }
 
         case Some(game) if game.isActive =>
