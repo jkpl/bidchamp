@@ -17,11 +17,9 @@ function msToTime(duration) {
 
 var createBidChampState = function() {
   var obj = {
-    items: ko.observable()
-  };
-
-  obj.updateUserId = function(userId) {
-    obj.userId = userId;
+    items: ko.observable(),
+    charity: ko.observable('-'),
+    ownedItems: ko.observable()
   };
 
   obj.updateItems = function(items) {
@@ -107,8 +105,12 @@ $(document).ready(function() {
     console.log('websocket received', e.data);
     var json = JSON.parse(e.data);
 
-    if (json.user) {
-      bidChampState.updateUserId(json.user);
+    if (json.charity) {
+      bidChampState.charity('£' + json.charity)
+    }
+
+    if (json.ownedItems) {
+      bidChampState.ownedItems(json.ownedItems);
     }
 
     if (json.items){

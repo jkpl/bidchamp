@@ -26,55 +26,71 @@
 
     <div class="page-content" id="app-root">
         <div class="mdl-layout-spacer"></div>
-        <div class="mdl-grid" data-bind="foreach: items">
-            <div class="mdl-cell mdl-cell--4-col">
-                <img alt="-" style="max-width: 100%; max-height: 100%;"
-                     data-bind="attr: { src: imagePath, alt: description }"/>
-            </div>
-            <div class="mdl-cell mdl-cell--6-col">
-                <h3 style="margin-top: 0px; margin-bottom: 10px" data-bind="text: description">-</h3>
-                <div class="mdl-grid">
-                    <ul class="mdl-list mdl-cell mdl-cell--6-col">
-                        <li class="mdl-list__item mdl-list__item--two-line">
-                            <span class="mdl-list__item-primary-content">
-                                <i class="material-icons mdl-list__item-icon">trending_up</i>
-                                <span>Achieved</span>
-                                <span class="mdl-list__item-sub-title" data-bind="text: achieved">-</span>
-                            </span>
-                        </li>
-                        <li class="mdl-list__item mdl-list__item--two-line">
-                            <span class="mdl-list__item-primary-content">
-                                <i class="material-icons mdl-list__item-icon">exposure</i>
-                                <span>Odds</span>
-                                <span class="mdl-list__item-sub-title" data-bind="text: odds"></span>
-                            </span>
-                        </li>
-                    </ul>
-                    <ul class="mdl-list mdl-cell mdl-cell--6-col">
-                        <li class="mdl-list__item mdl-list__item--two-line">
-                            <span class="mdl-list__item-primary-content">
-                                <i class="material-icons mdl-list__item-icon">timelapse</i>
-                                <span>Time left</span>
-                                <span class="mdl-list__item-sub-title" data-bind="text: timeRemaining"></span>
-                            </span>
-                        </li>
-                        <li class="mdl-list__item mdl-list__item--two-line">
-                            <span class="mdl-list__item-primary-content">
-                                <i class="material-icons mdl-list__item-icon">account_balance_wallet</i>
-                                <span>Current bid</span>
-                                <span class="mdl-list__item-sub-title" data-bind="text: bid"></span>
-                            </span>
-                        </li>
+        <div class="mdl-grid">
+            <div class="mdl-cell mdl-cell--10-col">
+                <div class="mdl-grid" data-bind="foreach: items">
+                    <div class="mdl-cell mdl-cell--4-col">
+                        <img alt="-" style="max-width: 100%; max-height: 100%;"
+                        data-bind="attr: { src: imagePath, alt: description }"/>
+                    </div>
+                    <div class="mdl-cell mdl-cell--8-col">
+                        <h3 style="margin-top: 0px; margin-bottom: 10px" data-bind="text: description">-</h3>
+                        <div class="mdl-grid">
+                            <ul class="mdl-list mdl-cell mdl-cell--6-col">
+                                <li class="mdl-list__item mdl-list__item--two-line">
+                                    <span class="mdl-list__item-primary-content">
+                                        <i class="material-icons mdl-list__item-icon">trending_up</i>
+                                        <span>Achieved</span>
+                                        <span class="mdl-list__item-sub-title" data-bind="text: achieved">-</span>
+                                    </span>
+                                </li>
+                                <li class="mdl-list__item mdl-list__item--two-line">
+                                    <span class="mdl-list__item-primary-content">
+                                        <i class="material-icons mdl-list__item-icon">exposure</i>
+                                        <span>Odds</span>
+                                        <span class="mdl-list__item-sub-title" data-bind="text: odds"></span>
+                                    </span>
+                                </li>
+                            </ul>
+                            <ul class="mdl-list mdl-cell mdl-cell--6-col">
+                                <li class="mdl-list__item mdl-list__item--two-line">
+                                    <span class="mdl-list__item-primary-content">
+                                        <i class="material-icons mdl-list__item-icon">timelapse</i>
+                                        <span>Time left</span>
+                                        <span class="mdl-list__item-sub-title" data-bind="text: timeRemaining"></span>
+                                    </span>
+                                </li>
+                                <li class="mdl-list__item mdl-list__item--two-line">
+                                    <span class="mdl-list__item-primary-content">
+                                        <i class="material-icons mdl-list__item-icon">account_balance_wallet</i>
+                                        <span>Current bid</span>
+                                        <span class="mdl-list__item-sub-title" data-bind="text: bid"></span>
+                                    </span>
+                                </li>
 
+                            </ul>
+                        </div>
+                        <button class="mdl-button mdl-js-button mdl-button--raised mdl-button--accent" data-bind="click: addBid">
+                            Raise bid by £10!
+                        </button>
+                        <button class="mdl-button mdl-js-button mdl-button--raised mdl-button--accent">
+                            <i class="material-icons">share</i>
+                            Share!
+                        </button>
+                    </div>
+                </div>
+            </div>
+            <div class="mdl-cell mdl-cell--2-col">
+                <div>
+                    <img src='@routes.Assets.versioned("images/cancer_res.png")' alt="Cancer Research UK"/>
+                    <p><strong>Donated:</strong> <span data-bind="text: charity">1000</span></p>
+                </div>
+                <div>
+                    <p><strong>Owned items:</strong></p>
+                    <ul class="mdl-list" data-bind="foreach: ownedItems">
+                        <li class="mdl-list__item" data-bind="text: name"></li>
                     </ul>
                 </div>
-                <button class="mdl-button mdl-js-button mdl-button--raised mdl-button--accent" data-bind="click: addBid">
-                    Raise bid by £10!
-                </button>
-                <button class="mdl-button mdl-js-button mdl-button--raised mdl-button--accent">
-                    <i class="material-icons">share</i>
-                    Share!
-                </button>
             </div>
         </div>
         <div class="mdl-layout-spacer"></div>
