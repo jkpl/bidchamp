@@ -31,8 +31,8 @@ var createBidChampState = function() {
 
     var nextItems = items.map(function(item) {
       return {
-        description: item.item.name + " (£" + item.item.price + ")",
-        achieved: (item.percentageAchieved * 100).toFixed(2) + "%",
+        description: item.item.name,
+        achieved: (item.percentageAchieved * 100).toFixed(2) + "% out of £" + item.item.price,
         imagePath: item.item.imagePath,
         endTime: item.gameEnds,
         odds: item.chanceOfWinning
