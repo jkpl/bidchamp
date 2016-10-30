@@ -178,9 +178,9 @@ object BidChampData {
 
   def start: BidChampData = {
     val items = List(
-      Item("Bicycle", 500),
-      Item("Macbook", 1200),
-      Item("Subaru", 10000)
+      Item("Bicycle", 500, "assets/images/bike.jpg"),
+      Item("Macbook", 1200, "assets/images/apple-macbook.jpg"),
+      Item("Subaru", 10000, "assets/images/subaru.jpg")
     ).map(item => item.name -> ItemData(item, 0)).toMap
 
     val users = MemoryUserStore.users.values.map(_.uuid).map(id => id -> UserData(id)).toMap
