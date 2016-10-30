@@ -9,7 +9,6 @@ GET     /socket                     controllers.BidChampController.socket
 
 POST /api/user/account              controllers.AuthController.createUserAccount()
 PUT  /api/user/account              controllers.AuthController.updateAccount()
-POST /api/user/bid                  controllers.BidChampController.bid()
 
 POST /api/user/login                controllers.AuthController.loginPost()
 GET  /api/user                      controllers.AuthController.getUser()

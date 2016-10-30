@@ -7,7 +7,7 @@ import actors.WebSocketActor
 import akka.actor.ActorSystem
 import akka.stream.Materializer
 import play.api.Logger
-import play.api.libs.json.{JsValue, Json}
+import play.api.libs.json.JsValue
 import play.api.libs.streams.ActorFlow
 import play.api.mvc._
 import services.{BidChampCore, UserStore}
@@ -23,10 +23,6 @@ class BidChampController @Inject()(
 
   val logger: Logger = Logger(this.getClass)
 
-  case class Bid(item: String, cash: BigDecimal, currency: String = "LIB")
-
-  implicit val fmtBid = Json.format[Bid]
-
   def state = Action { Ok("Cool story bro") }
 
   def socket = WebSocket.acceptOrResult[JsValue, JsValue] { request =>
@@ -41,26 +37,6 @@ class BidChampController @Inject()(
 
       flow.toRight(Forbidden)
     }
-  }
-
-  def bid() = withUser(parse.json) {
-    implicit request =>
-    val parse = request.body
-      .validate[Bid]
-      .fold(
-        errors => {
-          val errMsg = "/bid - unable to parse request body" + errors.mkString(", ")
-          logger.error(errMsg)
-          Try(throw new RuntimeException(errMsg))
-        },
-        valid => Try(valid)
-      )
-
-      parse.toOption.map { bid: Bid =>
-        bidChamp.gameActor ! bid
-        Ok
-      }.getOrElse(BadRequest)
-
   }
 
   def parseUuid(s: String): Option[UUID] = Try(UUID.fromString(s)).toOption
