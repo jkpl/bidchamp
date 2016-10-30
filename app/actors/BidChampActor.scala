@@ -27,7 +27,9 @@ class BidChampActor extends Actor with ActorLogging {
   private def ready(clients: Map[UUID, ActorRef], state: BidChampData): Receive = {
     case Subscribe(uuid) =>
       context.become(ready(clients + (uuid -> sender()), state))
-      state.userStateForId(uuid).foreach(sender() ! _)
+      state.userStateForId(uuid).fold(
+        log.info(s"Could not find user $uuid in state")
+      )(sender() ! _)
 
     case Unsubscribe =>
       context.become(ready(clients.filter(_._2 == sender()), state))

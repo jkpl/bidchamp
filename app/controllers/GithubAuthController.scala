@@ -3,6 +3,7 @@ package controllers
 import java.util.UUID
 import javax.inject.{Inject, Singleton}
 
+import model.BidChampData.AddUser
 import model.UserAccount
 import play.api.Configuration
 import play.api.libs.functional.syntax._
@@ -10,12 +11,12 @@ import play.api.libs.json.{Json, _}
 import play.api.libs.ws.WSClient
 import play.api.mvc.Results._
 import play.api.mvc._
-import services.{OAuth2, OAuth2Settings, UserStore}
+import services.{BidChampCore, OAuth2, OAuth2Settings, UserStore}
 
 import scala.concurrent.ExecutionContext.Implicits.global
 
 @Singleton
-class GithubAuthController @Inject()(userStore : UserStore, configuration: Configuration)(implicit wsClient : WSClient) {
+class GithubAuthController @Inject()(userStore : UserStore, configuration: Configuration, bidChampCore: BidChampCore)(implicit wsClient : WSClient) {
 
   val SESSION_TOKEN_KEY = "session-token"
 
@@ -68,6 +69,7 @@ class GithubAuthController @Inject()(userStore : UserStore, configuration: Confi
           githubUser.avatar_url
         )
       )
+      bidChampCore.gameActor ! AddUser(user.uuid)
       val upserted: UserAccount = userStore.upsertUser(user)
       val token = userStore.createSession(upserted.email)
       Redirect(routes.HomeController.index())

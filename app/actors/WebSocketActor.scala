@@ -37,7 +37,7 @@ class WebSocketActor(userId: UUID, out: ActorRef, gameActor : ActorRef) extends 
       out ! Json.toJson(event)
 
     case userState: UserState =>
-      log.info("Received user state: {}", userState)
+      log.info("SENDING STATE TO USER {}, {}", userId, userState)
       out ! Json.toJson(userState)
   }
 
@@ -46,6 +46,7 @@ class WebSocketActor(userId: UUID, out: ActorRef, gameActor : ActorRef) extends 
   }
 
   override def preStart(): Unit = {
+    log.info(s"USER ID : $userId")
     gameActor ! BidChampActor.Subscribe(userId)
   }
 }

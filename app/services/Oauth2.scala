@@ -18,7 +18,8 @@ abstract class OAuth2[T](settings: OAuth2Settings, wsClient : WSClient) {
 
   import settings._
 
-  lazy val signIn = signInUrl + "?client_id=" + clientId + "&redirect_uri=" + redirectUri
+//  lazy val signIn = signInUrl + "?client_id=" + clientId + "&redirect_uri=" + redirectUri
+  lazy val signIn = signInUrl + "?client_id=" + clientId
 
   def authenticate(code: String): Future[T] = {
     val url = accessTokenUrl + "?client_id=" + clientId + "&client_secret=" + clientSecret + "&code=" + code

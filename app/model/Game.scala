@@ -75,7 +75,7 @@ case class Running(startTime: Long, endTime: Long) extends Status {
 }
 
 object Running {
-  def apply(startTime: Long): Running = Running(startTime, startTime + (1 * 30 * 1000).toLong) // +1 minutes
+  def apply(startTime: Long): Running = Running(startTime, startTime + (1 * 60 * 1000).toLong) // +1 minutes
 }
 
 case class Finished(startTime: Long, endTime: Long, winners : List[UUID]) extends Status {

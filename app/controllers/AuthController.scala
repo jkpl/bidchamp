@@ -27,7 +27,7 @@ class AuthController @Inject() (val userStore: UserStore)
   val maxLoginAttempt = 5
 
   private val SessionTokenCookieName = "session-token"
-  private val cookieDomain = Some("localhost")
+  private val cookieDomain = Some("7379e367.ngrok.io")
 
   case class LoginCredentials(username: String, password: String)
 
