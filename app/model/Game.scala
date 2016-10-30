@@ -56,7 +56,7 @@ case class Game(item : Item, bids : Map[UUID, Int] = Map.empty, status : Status 
   }
 }
 
-case class Item(name : String, price : Int)
+case class Item(name : String, price : Int, imagePath : String)
 
 object Item {
   implicit val itemJsonFormat: OFormat[Item] = Json.format[Item]
