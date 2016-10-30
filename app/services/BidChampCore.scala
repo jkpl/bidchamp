@@ -12,5 +12,5 @@ trait BidChampCore {
 
 @Singleton
 class AtomicBidChampCore @Inject()(actorSystem : ActorSystem) extends BidChampCore {
-  override def gameActor: ActorRef = actorSystem.actorOf(BidChampActor.props)
+  override lazy val gameActor: ActorRef = actorSystem.actorOf(BidChampActor.props)
 }

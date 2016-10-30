@@ -1,4 +1,5 @@
 var sock = new WebSocket('ws://' + location.host + '/socket');
+//var donut;
 
 function msToTime(duration) {
   if (!Number.isInteger(duration) || duration < 1000) return "00:00:00";
@@ -24,6 +25,12 @@ var createBidChampState = function() {
   };
 
   obj.updateItems = function(items) {
+      //donut.setData([
+      //  {label: "Odds", value: chance},
+      //  {label: "-", value: 100 - chance}
+      //]);
+      //donut.select(0);
+
     var nextItems = items.map(function(item) {
       return {
         description: item.item.name + " (£" + item.item.price + ")",
@@ -77,6 +84,23 @@ $(document).ready(function() {
 
   sock.onopen = function() {
     console.log('websocket opened');
+
+      // donut = Morris.Donut({
+      //   element: 'odds',
+      //   data: [
+      //     {label: "Odds", value: 0},
+      //     {label: "-", value: 100}
+      //   ],
+      //   formatter: function (y, data) {
+      //     return y + '%'
+      //   },
+      //   colors: [
+      //     "#00BBD6",
+      //     "#b3d4fc"
+      //   ]
+      // });
+      //donut.select(0);
+
   };
 
   sock.onmessage = function(e) {

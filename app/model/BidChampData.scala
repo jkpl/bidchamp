@@ -29,7 +29,6 @@ case class BidChampData(
       (itemId, item) <- items
       if !currentGames.contains(itemId)
     } yield UserItem.fromItem(data, item.item)
-
     UserState(data.id, data.itemsWon, charity, userGames.toList ++ userItems.toList)
   }
 
@@ -109,25 +108,25 @@ case class BidChampData(
               justEvents(Event(Set.empty, EventContent(s"Item '${bid.item}' doesn't exist.", None)))
             case Some(itemData) =>
               val game = Game(itemData.item)
-              val currentAmount = game.bids.getOrElse(userId, 0)
-              if ((currentAmount + bid.amount) < itemData.item.price % 2) {
-                Result(
-                  state = updateGame(game.upsertBid(userId, bid.amount)),
-                  events = List(Event(Set(userId), EventContent(s"Created a new bid for item '${itemData.item.name}'.", Some(itemData.item.name))))
-                )
-              } else {
-                Result(updateGame(game), List(Event(Set(userId), EventContent("Can not bet more than 50% of price of item", Some(itemData.item.name)))))
-              }
+              Result(
+                state = updateGame(game.upsertBid(userId, bid.amount)),
+                events = List(Event(Set(userId), EventContent(s"Created a new bid for item '${itemData.item.name}'.", Some(itemData.item.name))))
+              )
           }
 
         case Some(game) if game.isActive =>
-          Result(
-            state = updateGame(game.upsertBid(userId, bid.amount)),
-            events = List(Event(
-              targets = game.bids.keySet - userId,
-              content = EventContent(s"New bid of ${bid.amount} has been added for item ${game.item.name}.", Some(game.item.name))
-            ))
-          )
+          val currentAmount = game.bids.getOrElse(userId, 0)
+          if ((currentAmount + bid.amount) < game.item.price / 2) {
+            Result(
+              state = updateGame(game.upsertBid(userId, bid.amount)),
+              events = List(Event(
+                targets = game.bids.keySet - userId,
+                content = EventContent(s"New bid of ${bid.amount} has been added for item ${game.item.name}.", Some(game.item.name))
+              ))
+            )
+          } else {
+            Result(updateGame(game), List(Event(Set(userId), EventContent("Can not bet more than 50% of price of item", Some(game.item.name)))))
+          }
         case Some(game) =>
           justEvents(Event(Set.empty, EventContent(s"Can't bid on finished games.", None)))
       }
