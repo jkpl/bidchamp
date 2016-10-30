@@ -4,7 +4,7 @@ var redrawTimeLeft = function(element, target) {
   return setInterval(function() {
     var timeRemaining = target - new Date();
     element.text(msToTime(timeRemaining));
-  }, 100);
+  }, 500);
 };
 
 function msToTime(duration) {
@@ -29,7 +29,10 @@ var bidChampState = (function() {
   function updateCard(item) {
     var d = new Date();
     $("#item-description").text(
-        item.item.name + " - £" + item.item.price + " - " + (item.percentageAchieved * 100).toFixed(2) + "%"
+        item.item.name + " (£" + item.item.price + ")"
+    );
+    $("#item-achieved").text(
+        (item.percentageAchieved * 100).toFixed(2) + "%"
     );
     $("#item-image").text(item.image);
     $("#item-odds").text(
