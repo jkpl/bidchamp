@@ -29,7 +29,8 @@ case class BidChampData(
       (itemId, item) <- items
       if !currentGames.contains(itemId)
     } yield UserItem.fromItem(data, item.item)
-    UserState(data.id, data.itemsWon, charity, userGames.toList ++ userItems.toList)
+
+    UserState(data.id, data.itemsWon, charity, (userGames.toList ++ userItems.toList).sortBy(_.item.name))
   }
 
   def eval(command: InternalCommand): Result = command match {
@@ -105,7 +106,7 @@ case class BidChampData(
         case None =>
           items.get(bid.item) match {
             case None =>
-              justEvents(Event(None, EventContent(s"Item '${bid.item}' doesn't exist.", None)))
+              justEvents(Event(Some(Set.empty), EventContent(s"Item '${bid.item}' doesn't exist.", None)))
             case Some(itemData) =>
               val game = Game(itemData.item)
               Result(
@@ -183,18 +184,17 @@ object BidChampData {
       Item("Subaru", 10000, "assets/images/subaru.jpg")
     ).map(item => item.name -> ItemData(item, 0)).toMap
 
-    val users = MemoryUserStore.users.values.map(_.uuid).map(id => id -> UserData(id)).toMap
-    val userIds = users.keys.toList
+    val sortedUserIds = MemoryUserStore.users.values.toList.sortBy(_.name).map(_.uuid)
+    val users = sortedUserIds.map(id => id -> UserData(id)).toMap
 
     val currentGames = Map(
       "Macbook" -> Game(items("Macbook").item)
-        .upsertBid(userIds(0), 190)
-        .upsertBid(userIds(1), 512)
-        .upsertBid(userIds(2), 370)
-        .upsertBid(userIds(3), 220)
+        .upsertBid(sortedUserIds(0), 190)
+        .upsertBid(sortedUserIds(1), 512)
+        .upsertBid(sortedUserIds(2), 370)
+        .upsertBid(sortedUserIds(3), 220)
         .updateStatus(),
-
-      "Bicycle" -> Game(items("Bicycle").item).upsertBid(userIds.head, 102).updateStatus()
+      "Bicycle" -> Game(items("Bicycle").item).upsertBid(sortedUserIds.head, 102).updateStatus()
     )
 
     BidChampData(
