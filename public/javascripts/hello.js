@@ -1,4 +1,5 @@
 var sock = new WebSocket('ws://' + location.host + '/socket');
+var donut;
 
 var redrawTimeLeft = function(element, target) {
   return setInterval(function() {
@@ -35,11 +36,12 @@ var bidChampState = (function() {
         (item.percentageAchieved * 100).toFixed(2) + "%"
     );
     $("#item-image").text(item.image);
-    $("#item-odds").text(
-        item.chanceOfWinning
-            ? (item.chanceOfWinning * 100).toFixed(2) + "%"
-            : "-"
-    );
+    var chance = item.chanceOfWinning ? (item.chanceOfWinning * 100).toFixed(2) : 0.0;
+    //donut.setData([
+    //  {label: "Odds", value: chance},
+    //  {label: "-", value: 100 - chance}
+    //]);
+    //donut.select(0);
     if (item.gameEnds) {
       item.timerId = redrawTimeLeft($("#item-time-left"), new Date(item.gameEnds));
     } else {
@@ -89,6 +91,22 @@ var bidChampState = (function() {
 
 sock.onopen = function() {
   console.log('websocket opened');
+
+  // donut = Morris.Donut({
+  //   element: 'odds',
+  //   data: [
+  //     {label: "Odds", value: 0},
+  //     {label: "-", value: 100}
+  //   ],
+  //   formatter: function (y, data) {
+  //     return y + '%'
+  //   },
+  //   colors: [
+  //     "#00BBD6",
+  //     "#b3d4fc"
+  //   ]
+  // });
+  //donut.select(0);
 };
 
 sock.onmessage = function(e) {
@@ -109,3 +127,5 @@ sock.onmessage = function(e) {
 sock.onclose = function() {
   console.log('websocket closed');
 };
+
+
