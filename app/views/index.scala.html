@@ -45,6 +45,19 @@
   height: 176px;
   background: url('assets/images/apple-macbook.jpg') center / cover;
  }
+ #item-name {
+     text-shadow: 2px 2px 8px #000000;
+     font-weight: bold;
+     padding-left: 8px;
+     padding-right: 8px;
+ }
+ #item-price {
+     text-shadow: 2px 2px 8px #000000;
+     position: absolute;
+     right: 10px;
+     padding-left: 8px;
+     padding-right: 8px;
+ }
  .demo-card-wide > .mdl-card__menu {
   color: #fff;
  }
@@ -259,8 +272,8 @@
    </div>
   </div>
   <div class="mdl-cell mdl-cell--2-col">
-   <button class="mdl-button mdl-js-button mdl-button--fab mdl-js-ripple-effect mdl-button--colored">
-    <i class="material-icons">add</i>
+   <button id="item-bid" class="mdl-button mdl-js-button mdl-button--fab mdl-js-ripple-effect mdl-button--colored">
+    Bid
    </button>
   </div>
   <div class="mdl-cell mdl-cell--2-col">

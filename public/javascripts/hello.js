@@ -23,14 +23,15 @@ sock.onclose = function() {
 
 var updateCard = function(userItem) {
   var d = new Date();
-  timeRemaining = userItem.gameEnds - d.getTime();
+  if (userItem.gameEnds) {
+    timeRemaining = userItem.gameEnds - d.getTime();
+  }
   $("#item-name").text(userItem.item.name);
-  $("#item-description").text(userItem.description);
+  $("#item-description").text(userItem.gameStatus);
   $("#item-image").text(userItem.image);
   $("#item-price").text("£" + userItem.item.price);
-  $("#item-odds").text((userItem.chanceOfWinning * 100).toFixed(2) + "%");
-  $("#item-time-left").text(msToTime(timeRemaining));
-  $("#item-bid-amount").text("£" + userItem.moneySpent);
+  $("#item-odds").text((userItem.chanceOfWinning) ? (userItem.chanceOfWinning * 100).toFixed(2) + "%" : "0%");
+  $("#item-bid-amount").text((userItem.moneySpent) ? "£" + userItem.moneySpent : "£0");
 };
 
 var redrawTimeLeft = function() {
