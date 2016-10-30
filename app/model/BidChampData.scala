@@ -54,18 +54,18 @@ case class BidChampData(
 
     case AddUser(userId) =>
       if (users.values.exists(_.id == userId))
-        justEvents(Event(Set.empty, EventContent(s"User '$userId' already exists.", None)))
+        justEvents(Event(None, EventContent(s"User '$userId' already exists.", None)))
       else {
         val userData = UserData(userId)
         Result(
           state = copy(users = users + (userData.id -> userData)),
-          events = List(Event(Set.empty, EventContent(s"User '$userId' created", None)))
+          events = List(Event(None, EventContent(s"User '$userId' created", None)))
         )
       }
 
     case UserCommand(userId, c) =>
       users.get(userId) match {
-        case None => justEvents(Event(Set.empty, EventContent(s"Invalid user.", None)))
+        case None => justEvents(Event(None, EventContent(s"Invalid user.", None)))
         case Some(userData) =>
           evalWithUser(userData.id, c)
       }
@@ -105,12 +105,12 @@ case class BidChampData(
         case None =>
           items.get(bid.item) match {
             case None =>
-              justEvents(Event(Set.empty, EventContent(s"Item '${bid.item}' doesn't exist.", None)))
+              justEvents(Event(None, EventContent(s"Item '${bid.item}' doesn't exist.", None)))
             case Some(itemData) =>
               val game = Game(itemData.item)
               Result(
                 state = updateGame(game.upsertBid(userId, bid.amount)),
-                events = List(Event(Set(userId), EventContent(s"Created a new bid for item '${itemData.item.name}'.", Some(itemData.item.name))))
+                events = List(Event(Some(Set(userId)), EventContent(s"Created a new bid for item '${itemData.item.name}'.", Some(itemData.item.name))))
               )
           }
 
@@ -120,15 +120,15 @@ case class BidChampData(
             Result(
               state = updateGame(game.upsertBid(userId, bid.amount)),
               events = List(Event(
-                targets = game.bids.keySet - userId,
+                targets = Some(game.bids.keySet - userId),
                 content = EventContent(s"New bid of ${bid.amount} has been added for item ${game.item.name}.", Some(game.item.name))
               ))
             )
           } else {
-            Result(updateGame(game), List(Event(Set(userId), EventContent("Can not bet more than 50% of price of item", Some(game.item.name)))))
+            Result(updateGame(game), List(Event(Some(Set(userId)), EventContent("Can not bet more than 50% of price of item", Some(game.item.name)))))
           }
         case Some(game) =>
-          justEvents(Event(Set.empty, EventContent(s"Can't bid on finished games.", None)))
+          justEvents(Event(None, EventContent(s"Can't bid on finished games.", None)))
       }
   }
 
@@ -140,7 +140,7 @@ case class BidChampData(
     (oldGame.status, updatedGame.status) match {
       case (NotStarted, _: Running) =>
         List(Event(
-          targets = bidders,
+          targets = Some(bidders),
           content = EventContent(s"The bid for '$itemName' has started! ~1 minute until winners are drawn!", Some(gameId))
         ))
 
@@ -151,11 +151,11 @@ case class BidChampData(
 
         List(
           Event(
-            targets = losers,
+            targets = Some(losers),
             content = EventContent(s"$finishedMsg Better luck next time!", Some(gameId))
           ),
           Event(
-            targets = winnerSet,
+            targets = Some(winnerSet),
             content = EventContent(s"$finishedMsg You have won!", Some(gameId))
           )
         )
@@ -193,6 +193,7 @@ object BidChampData {
         .upsertBid(userIds(2), 370)
         .upsertBid(userIds(3), 220)
         .updateStatus(),
+
       "Bicycle" -> Game(items("Bicycle").item).upsertBid(userIds.head, 102).updateStatus()
     )
 
@@ -204,7 +205,7 @@ object BidChampData {
   }
 
   case class Event(
-    targets: Set[UUID],
+    targets: Option[Set[UUID]],
     content: EventContent
   )
 

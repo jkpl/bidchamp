@@ -48,7 +48,7 @@ class BidChampActor extends Actor with ActorLogging {
 
       for {
         event <- result.events
-        target <- event.targets
+        target <- event.targets.getOrElse(Set())
         client <- clients.get(target)
       } client ! event.content
 

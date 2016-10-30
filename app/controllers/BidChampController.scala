@@ -26,8 +26,6 @@ class BidChampController @Inject()(
   def state = Action { Ok("Cool story bro") }
 
   def socket = WebSocket.acceptOrResult[JsValue, JsValue] { request =>
-    println(request)
-
     Future.successful {
       val flow = for {
         tokenString <- request.session.get("session-token")
