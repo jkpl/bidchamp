@@ -1,46 +1,15 @@
 var sock = new WebSocket('ws://' + location.host + '/socket');
 
-var timeRemaining = 0;
-
-sock.onopen = function() {
-  console.log('websocket opened');
+var redrawTimeLeft = function(element, target) {
+  return setInterval(function() {
+    var timeRemaining = target - new Date();
+    element.text(msToTime(timeRemaining));
+  }, 100);
 };
-
-sock.onmessage = function(e) {
-  console.log('websocket received', e.data);
-  var json = JSON.parse(e.data);
-  if (json.items){
-    updateCard(json.items[1]);
-  } else if (json.eventType === 'NOTIFICATION'){
-    $.notify(json.body, "success");
-  }
-};
-
-sock.onclose = function() {
-  console.log('websocket closed');
-};
-
-var updateCard = function(userItem) {
-  var d = new Date();
-  timeRemaining = userItem.gameEnds - d.getTime();
-  $("#item-name").text(userItem.item.name);
-  $("#item-description").text(userItem.description);
-  $("#item-image").text(userItem.image);
-  $("#item-price").text("£" + userItem.item.price);
-  $("#item-odds").text((userItem.chanceOfWinning * 100).toFixed(2) + "%");
-  $("#item-time-left").text(msToTime(timeRemaining));
-  $("#item-bid-amount").text("£" + userItem.moneySpent);
-};
-
-var redrawTimeLeft = function() {
-  setInterval(function() {
-    timeRemaining = timeRemaining - 1000;
-    $("#item-time-left").text(msToTime((timeRemaining < 1000) ? 0 : timeRemaining));
-  }, 1000);
-};
-redrawTimeLeft();
 
 function msToTime(duration) {
+  if (!Number.isInteger(duration) || duration < 1000) return "00:00:00";
+
   var seconds = parseInt((duration/1000)%60)
       , minutes = parseInt((duration/(1000*60))%60)
       , hours = parseInt((duration/(1000*60*60))%24);
@@ -52,3 +21,88 @@ function msToTime(duration) {
   return hours + ":" + minutes + ":" + seconds ;
 }
 
+var bidChampState = (function() {
+  var obj = {
+    items: []
+  };
+
+  function updateCard(item) {
+    var d = new Date();
+    $("#item-description").text(
+        item.item.name + " - £" + item.item.price + " - " + (item.percentageAchieved * 100).toFixed(2) + "%"
+    );
+    $("#item-image").text(item.image);
+    $("#item-odds").text(
+        item.chanceOfWinning
+            ? (item.chanceOfWinning * 100).toFixed(2) + "%"
+            : "-"
+    );
+    if (item.gameEnds) {
+      item.timerId = redrawTimeLeft($("#item-time-left"), new Date(item.gameEnds));
+    } else {
+      $("#item-time-left").text('-')
+    }
+    $("#item-bid-amount").text(
+        item.moneySpent
+            ? "£" + item.moneySpent
+            : "-"
+    );
+
+    $("#item-increase-bid")
+        .off('click')
+        .on('click', function() {
+            console.log("Send bid!");
+            sock.send(JSON.stringify({
+              command: "addToBid",
+              payload: {
+                item: "Macbook",
+                amount: 10
+              }
+            }));
+        });
+  }
+
+  obj.updateUserId = function(userId) {
+    obj.userId = userId;
+  };
+
+  obj.updateItems = function(items) {
+    obj.items.forEach(function(item) {
+      if (item.timerId) {
+        clearInterval(item.timerId);
+      }
+    });
+    obj.items = items;
+
+    obj.items.forEach(function(item, index) {
+      if (item.item.name === 'Macbook') {
+        updateCard(item)
+      }
+    });
+  };
+
+  return obj;
+}());
+
+sock.onopen = function() {
+  console.log('websocket opened');
+};
+
+sock.onmessage = function(e) {
+  console.log('websocket received', e.data);
+  var json = JSON.parse(e.data);
+
+  if (json.user) {
+    bidChampState.updateUserId(json.user);
+  }
+
+  if (json.items){
+    bidChampState.updateItems(json.items);
+  } else if (json.eventType === 'NOTIFICATION'){
+    $.notify(json.body, "success", {autoHideDelay: 10000, });
+  }
+};
+
+sock.onclose = function() {
+  console.log('websocket closed');
+};

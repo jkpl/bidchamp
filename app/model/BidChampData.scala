@@ -120,7 +120,7 @@ case class BidChampData(
             state = updateGame(game.upsertBid(userId, bid.amount)),
             events = List(Event(
               targets = game.bids.keySet - userId,
-              content = EventContent(s"New bid of ${bid.amount} has been added for item ${game.item.toString}.", Some(game.item.name))
+              content = EventContent(s"New bid of ${bid.amount} has been added for item ${game.item.name}.", Some(game.item.name))
             ))
           )
         case Some(game) =>
@@ -174,8 +174,8 @@ object BidChampData {
 
   def start: BidChampData = {
     val items = List(
-      Item("Macbook", 2000),
       Item("Bicycle", 500),
+      Item("Macbook", 1200),
       Item("Subaru", 10000)
     ).map(item => item.name -> ItemData(item, 0)).toMap
 
@@ -183,8 +183,13 @@ object BidChampData {
     val userIds = users.keys.toList
 
     val currentGames = Map(
-      "Macbook" -> Game(items("Macbook").item).upsertBid(userIds.head, 534),
-      "Bicycle" -> Game(items("Bicycle").item).upsertBid(userIds.head, 123).upsertBid(userIds(1), 222).upsertBid(userIds(2), 320).updateStatus()
+      "Macbook" -> Game(items("Macbook").item)
+        .upsertBid(userIds(0), 190)
+        .upsertBid(userIds(1), 512)
+        .upsertBid(userIds(2), 370)
+        .upsertBid(userIds(3), 220)
+        .updateStatus(),
+      "Bicycle" -> Game(items("Bicycle").item).upsertBid(userIds.head, 102).updateStatus()
     )
 
     BidChampData(
